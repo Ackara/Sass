@@ -328,3 +328,10 @@ ASALocalRun/
 
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
+
+# Generated Files
+*.map.*
+*.min.*
+
+# Sensitive Files
+[Ss]ecrets.*

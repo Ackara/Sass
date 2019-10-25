@@ -1,0 +1,48 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+
+    <IsPackable>false</IsPackable>
+
+    <RootNamespace>Acklann.Sass</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Acklann.Diffa" Version="1.0.3" />
+    <PackageReference Include="AutoBogus.Conventions" Version="2.7.3" />
+    <PackageReference Include="AutoBogus.FakeItEasy" Version="2.7.3" />
+    <PackageReference Include="FakeItEasy" Version="5.4.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.2.0" />
+    <PackageReference Include="MSTest.TestAdapter" Version="1.4.0" />
+    <PackageReference Include="MSTest.TestFramework" Version="1.4.0" />
+    <PackageReference Include="coverlet.collector" Version="1.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+    <PackageReference Include="Shouldly" Version="3.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Sass.MSBuild\Sass.MSBuild.csproj" />
+    <ProjectReference Include="..\..\src\Sass\Sass.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Sample.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Sample.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Sample.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Sample.tt</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+</Project>
