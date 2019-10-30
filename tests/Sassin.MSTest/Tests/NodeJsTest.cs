@@ -8,18 +8,20 @@ namespace Acklann.Sassin.Tests
     public class NodeJsTest
     {
         [TestMethod]
-        public void Can_check_nodejs_availibility()
+        public void Can_load_modules()
         {
             // Arrange
-            if (Directory.Exists(NodeJsController.WorkingDirectory)) Directory.Delete(NodeJsController.WorkingDirectory, recursive: true);
+            var node_modules = Path.Combine(NodeJS.InstallationDirectory, "node_modules");
+            //if (Directory.Exists(node_modules)) Directory.Delete(node_modules, recursive: true);
 
             // Act
-            NodeJsController.Install();
-            var afterInstalltion = NodeJsController.CheckInstallation();
+            NodeJS.Install();
+            var installed = NodeJS.CheckInstallation();
+            var modulesExist = Directory.Exists(node_modules);
 
             // Assert
-
-            afterInstalltion.ShouldBeTrue();
+            installed.ShouldBeTrue();
+            modulesExist.ShouldBeTrue();
         }
     }
 }

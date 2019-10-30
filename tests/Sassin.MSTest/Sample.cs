@@ -21,6 +21,7 @@ namespace Acklann.Sassin
         }
 
 		public static FileInfo GetAppSCSS() => GetFile(@"app.scss");
+		public static FileInfo GetBasicSCSS() => GetFile(@"basic.scss");
 		public static FileInfo GetButtonsSCSS() => GetFile(@"base\_buttons.scss");
 		public static FileInfo GetLayoutSCSS() => GetFile(@"base\_layout.scss");
 		public static FileInfo GetResetSCSS() => GetFile(@"base\_reset.scss");
@@ -33,6 +34,7 @@ namespace Acklann.Sassin
 		public struct File
 		{
 			public const string AppSCSS = @"app.scss";
+			public const string BasicSCSS = @"basic.scss";
 			public const string ButtonsSCSS = @"base\_buttons.scss";
 			public const string LayoutSCSS = @"base\_layout.scss";
 			public const string ResetSCSS = @"base\_reset.scss";

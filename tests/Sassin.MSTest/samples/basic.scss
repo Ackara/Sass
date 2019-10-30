@@ -1,0 +1,10 @@
+$value: #000;
+
+.item {
+    background-color: $value;
+    opacity: 0.8;
+
+    &:hover {
+        opacity: 1;
+    }
+}
