@@ -6,14 +6,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="nodejs.zip" />
+    <None Remove="compiler.js" />
   </ItemGroup>
 
-  <Target Name="DownloadNodeJs" BeforeTargets="PreBuildEvent" Condition="!Exists('nodejs.zip')">
-    <DownloadFile SourceUrl="https://nodejs.org/dist/v12.13.0/node-v12.13.0-win-x64.zip" DestinationFolder="$(MSBuildProjectDirectory)" Retries="2" RetryDelayMilliseconds="7000">
-      <Output TaskParameter="DownloadedFile" PropertyName="Package" />
-    </DownloadFile>
+  <ItemGroup>
+    <EmbeddedResource Include="compiler.js" />
+  </ItemGroup>
 
-    <Move SourceFiles="$(Package)" DestinationFiles="nodejs.zip" />
-  </Target>
 </Project>

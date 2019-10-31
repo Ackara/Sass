@@ -1,15 +1,27 @@
 namespace Acklann.Sassin
 {
-    public class CompilerError
+    public readonly struct CompilerError
     {
-        public string Message { get; set; }
+        public CompilerError(string message, string file, int line, int column, ErrorLevel severity = ErrorLevel.Error, string code = null)
+        {
+            Severity = severity;
+            Message = message;
+            StatusCode = code;
+            File = file;
+            Line = line;
+            Column = column;
+        }
 
-        public string File { get; set; }
+        public ErrorLevel Severity { get; }
 
-        public int Line { get; set; }
+        public string StatusCode { get; }
 
-        public int Column { get; set; }
+        public string Message { get; }
 
-        public int StatusCode { get; set; }
+        public string File { get; }
+
+        public int Line { get; }
+
+        public int Column { get; }
     }
 }

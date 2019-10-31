@@ -19,5 +19,13 @@ namespace Acklann.Sassin
         public string SourceMapDirectory { get; set; }
 
         public string Suffix { get; set; }
+
+        public override string ToString()
+        {
+            string quote(object obj) => string.Concat('"', obj, '"');
+            string format(bool bit) => (bit ? "true" : "false");
+
+            return string.Concat(Minify);
+        }
     }
 }

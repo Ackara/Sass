@@ -7,12 +7,12 @@ namespace Acklann.Sassin
 {
     public class NodeJS
     {
+        public static readonly string InstallationDirectory = Path.Combine(AppContext.BaseDirectory, "tools");
+
         private static readonly string[] _dependencies = new string[]
-        {
+                {
             "node-sass@4.13.0", "csso@4.0.1", "multi-stage-sourcemap@0.3.1"
         };
-
-        public static readonly string InstallationDirectory = Path.Combine(AppContext.BaseDirectory, "tools");
 
         public static bool CheckInstallation()
         {
@@ -57,7 +57,22 @@ namespace Acklann.Sassin
             return cmd;
         }
 
-        internal static void ExtractBinaries(bool overwrite = false)
+        private static Process GetStartInfo(string command = null)
+        {
+            var info = new ProcessStartInfo
+            {
+                FileName = "cmd",
+                Arguments = command,
+                CreateNoWindow = true,
+                UseShellExecute = false,
+                RedirectStandardError = true,
+                RedirectStandardOutput = true
+            };
+
+            return new Process() { StartInfo = info };
+        }
+
+        private static void ExtractBinaries(bool overwrite = false)
         {
             Assembly assembly = typeof(NodeJS).Assembly;
             string extension;
@@ -82,7 +97,7 @@ namespace Acklann.Sassin
                 }
         }
 
-        internal static void InstallModules()
+        private static void InstallModules()
         {
             Process npm = null;
 
@@ -105,21 +120,6 @@ namespace Acklann.Sassin
                 }
             }
             finally { npm?.Dispose(); }
-        }
-
-        private static Process GetStartInfo(string command = null)
-        {
-            var info = new ProcessStartInfo
-            {
-                FileName = "cmd",
-                Arguments = command,
-                CreateNoWindow = true,
-                UseShellExecute = false,
-                RedirectStandardError = true,
-                RedirectStandardOutput = true
-            };
-
-            return new Process() { StartInfo = info };
         }
     }
 }
