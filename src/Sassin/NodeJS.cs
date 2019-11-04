@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 
 namespace Acklann.Sassin
@@ -41,10 +42,10 @@ namespace Acklann.Sassin
         {
             string modulesFolder = Path.Combine(InstallationDirectory, "node_modules");
             if (!Directory.Exists(modulesFolder))
-            {
                 InstallModules();
+
+            if (!Directory.EnumerateFiles(InstallationDirectory, "*.js").Any())
                 ExtractBinaries(overwrite);
-            }
         }
 
         public static Process Execute(string command, bool doNotWait = false)

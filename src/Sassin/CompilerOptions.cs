@@ -9,23 +9,30 @@ namespace Acklann.Sassin
         }
 
         public bool Minify { get; set; }
-
+        public string Suffix { get; set; }
+        public string OutputDirectory { get; set; }
         public bool KeepIntermediateFiles { get; set; }
 
+        public string SourceMapDirectory { get; set; }
+        public bool GenerateSourceMaps { get; set; }
         public bool AddSourceComments { get; set; }
 
-        public bool GenerateSourceMaps { get; set; }
-
-        public string SourceMapDirectory { get; set; }
-
-        public string Suffix { get; set; }
-
-        public override string ToString()
+        public string ToArgs()
         {
-            string quote(object obj) => string.Concat('"', obj, '"');
-            string format(bool bit) => (bit ? "true" : "false");
+            string toJs(bool bit) => (bit ? "true" : "false");
+            string escape(object obj) => string.Concat('"', obj, '"');
 
-            return string.Concat(Minify);
+            return string.Concat(
+                escape(OutputDirectory), " ",
+                escape(SourceMapDirectory), " ",
+                
+                escape(Suffix), " ",
+                toJs(Minify), " ",
+
+                toJs(KeepIntermediateFiles), " ",
+                toJs(GenerateSourceMaps), " ",
+                toJs(AddSourceComments)
+                );
         }
     }
 }

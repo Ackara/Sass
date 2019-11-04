@@ -15,13 +15,19 @@ namespace Acklann.Sassin
             string compiler = Path.Combine(NodeJS.InstallationDirectory, "compiler.js");
             if (!File.Exists(compiler)) throw new FileNotFoundException($"Could not find file at '{compiler}'.");
 
-            using (Process node = NodeJS.Execute($"/c node \"{compiler}\" \"{sassFilePath}\" {options}"))
+            if (!string.IsNullOrEmpty(options.OutputDirectory) && !Directory.Exists(options.OutputDirectory))
+                Directory.CreateDirectory(options.OutputDirectory);
+
+            if (!string.IsNullOrEmpty(options.SourceMapDirectory) && !Directory.Exists(options.SourceMapDirectory))
+                Directory.CreateDirectory(options.SourceMapDirectory);
+
+            using (Process node = NodeJS.Execute($"/c node \"{compiler}\" \"{sassFilePath}\" {options.ToArgs()}"))
             {
                 return new CompilerResult
                 {
                     SourceFile = sassFilePath,
                     Success = (node.ExitCode == 0),
-                    Errors = GetErrors(node.StandardError),
+                    Errors = GetErrors(node.StandardError).ToArray(),
                     GeneratedFiles = GetGeneratedFiles(node.StandardOutput).ToArray()
                 };
             }
@@ -31,9 +37,12 @@ namespace Acklann.Sassin
         {
             JArray json; string line = null;
 
-            while (reader.EndOfStream)
+            while (!reader.EndOfStream)
             {
                 line = reader.ReadLine();
+#if DEBUG
+                System.Diagnostics.Debug.WriteLine(line);
+#endif
                 if (string.IsNullOrEmpty(line) || !line.StartsWith("[")) continue;
 
                 json = JArray.Parse(line);
@@ -43,30 +52,29 @@ namespace Acklann.Sassin
             return new string[0];
         }
 
-        private static CompilerError[] GetErrors(StreamReader reader)
+        private static IEnumerable<CompilerError> GetErrors(StreamReader reader)
         {
-            if (reader == null) return new CompilerError[0];
+            if (reader == null) yield break;
 
             JObject json; string line = null;
-            var errors = new List<CompilerError>();
-            while (reader.EndOfStream)
+            while (!reader.EndOfStream)
             {
                 line = reader.ReadLine();
+#if DEBUG
+                System.Diagnostics.Debug.WriteLine(line);
+#endif
                 if (string.IsNullOrEmpty(line) || !line.StartsWith("{")) continue;
 
                 json = JObject.Parse(line);
-                errors.Add(new CompilerError
-                (
+                yield return new CompilerError(
                     json["message"].Value<string>(),
                     json["file"].Value<string>(),
                     (json["line"]?.Value<int>() ?? -1),
                     (json["column"]?.Value<int>() ?? -1),
-                    ((ErrorLevel)json["level"].Value<int>()),
+                    ((ErrorLevel)(json["level"]?.Value<int>() ?? (int)ErrorLevel.Error)),
                     json["status"].Value<string>()
-                ));
+                );
             }
-
-            return errors.ToArray();
         }
     }
 }

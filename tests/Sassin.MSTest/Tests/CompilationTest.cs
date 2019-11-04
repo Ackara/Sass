@@ -1,6 +1,6 @@
-using Acklann.Diffa;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Shouldly;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -14,6 +14,11 @@ namespace Acklann.Sassin.Tests
         [ClassInitialize]
         public static void Initialize(TestContext context)
         {
+            foreach (var item in Directory.EnumerateFiles(NodeJS.InstallationDirectory, "*.js"))
+            {
+                File.Delete(item);
+            }
+
             NodeJS.Install();
         }
 
@@ -22,14 +27,14 @@ namespace Acklann.Sassin.Tests
         public void Can_compile_sass_file(string label, int expectedFiles, CompilerOptions options)
         {
             // Arrange
-            var cwd = Path.Combine(Path.GetTempPath(), nameof(Sassin), label);
+            var cwd = Path.Combine(AppContext.BaseDirectory, "generated", label);
             if (Directory.Exists(cwd)) Directory.Delete(cwd, recursive: true);
             Directory.CreateDirectory(cwd);
 
-            var sassFile = Sample.GetBasicSCSS().CopyTo(Path.Combine(cwd, "test.scss"), overwrite: true).FullName;
+            options.OutputDirectory = cwd;
 
             // Act
-            var result = Sass.Compile(sassFile, options);
+            var result = Sass.Compile(Sample.GetBasicSCSS().FullName, options);
             var totalFiles = Directory.GetFiles(cwd, "*").Length;
 
             var builder = new StringBuilder();
@@ -45,39 +50,23 @@ namespace Acklann.Sassin.Tests
 
             // Assert
             result.Success.ShouldBeTrue();
-            totalFiles.ShouldBe(totalFiles);
-            result.GeneratedFiles.Length.ShouldBe(expectedFiles - 1);
+            totalFiles.ShouldBe(expectedFiles);
+            result.GeneratedFiles.Length.ShouldBe(expectedFiles);
 
             //Diff.Approve(builder);
         }
 
-        [TestMethod]
-        public void Can_generate_sass_to_css_map_file()
-        {
-            throw new System.NotImplementedException();
-        }
-
-        #region Backing Members
+        // ==================== DATA ==================== //
 
         private static IEnumerable<object[]> GetCompilierOptions()
         {
-            yield return new object[]{"minimal", 2, new CompilerOptions
+            yield return new object[]{"css", 1, new CompilerOptions
             {
-                Minify = false,
+                Minify = true,
                 AddSourceComments = false,
-                GenerateSourceMaps = false,
-                KeepIntermediateFiles = false,
-            }};
-
-            yield return new object[]{"map-1", 3, new CompilerOptions
-            {
-                Minify = false,
-                AddSourceComments = true,
                 GenerateSourceMaps = true,
-                KeepIntermediateFiles = true,
+                KeepIntermediateFiles = false
             }};
         }
-
-        #endregion Backing Members
     }
 }
