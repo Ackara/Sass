@@ -1,10 +1,59 @@
-$value: #000;
+// this should be removed
+/* this should be removed */
 
-.item {
-    background-color: $value;
-    opacity: 0.8;
+html, body {
+    font-family: Consolas;
+    height: 100%;
+    width: 100%;
+    color: black;
+}
+
+ul {
+    list-style: none;
+}
+
+li {
+    margin: 1px;
+    padding: 1em;
+}
+
+.row {
+    display: flex;
+}
+
+%color {
+    color: white;
+    cursor: pointer;
+
+    transition: {
+        property: background-color;
+        duration: 250ms;
+    }
+}
+
+.red {
+    @extend %color;
+    background-color: lighten(red, 15);
 
     &:hover {
-        opacity: 1;
+        background-color: red;
+    }
+}
+
+.green {
+    @extend %color;
+    background-color: lighten(green, 15);
+
+    &:hover {
+        background-color: green;
+    }
+}
+
+.blue {
+    @extend %color;
+    background-color: lighten(blue, 15);
+
+    &:hover {
+        background-color: blue;
     }
 }
