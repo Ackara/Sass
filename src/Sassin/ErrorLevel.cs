@@ -2,7 +2,7 @@ namespace Acklann.Sassin
 {
     public enum ErrorLevel
     {
-        Info,
+        Debug,
         Warning,
         Error
     }

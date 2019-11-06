@@ -1,0 +1,56 @@
+== basic.css
+==================================================
+/* this should be removed */
+html, body {
+  font-family: Consolas;
+  height: 100%;
+  width: 100%;
+  color: black;
+}
+
+ul {
+  list-style: none;
+}
+
+li {
+  margin: 1px;
+  padding: 1em;
+}
+
+.row {
+  display: flex;
+}
+
+.red, .green, .blue {
+  color: white;
+  cursor: pointer;
+  transition-property: background-color;
+  transition-duration: 250ms;
+}
+
+.red {
+  background-color: #ff4d4d;
+}
+
+.red:hover {
+  background-color: red;
+}
+
+.green {
+  background-color: #00cd00;
+}
+
+.green:hover {
+  background-color: green;
+}
+
+.blue {
+  background-color: #4d4dff;
+}
+
+.blue:hover {
+  background-color: blue;
+}
+
+
+

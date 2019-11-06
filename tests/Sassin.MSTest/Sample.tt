@@ -38,7 +38,7 @@ namespace <#= Host.ResolveAssemblyReference("$(RootNamespace)") #>
 	PushIndent("\t\t");
 	foreach ((string relativeDir, string safeName, FileInfo file) in GetFileList())
 	{
-		string methodName = string.Concat(safeName, file.Extension.TrimStart('.').ToUpper()).Replace(" ", "").Replace("_", "");
+		string methodName = string.Concat(safeName, file.Extension.TrimStart('.').ToUpper()).Replace(" ", "").Replace("_", "").Replace("-", "");
 		WriteLine($"public static FileInfo Get{methodName}() => GetFile(@\"{Path.Combine(relativeDir, file.Name)}\");");
 	}
 	PopIndent();

@@ -21,19 +21,42 @@ function compile(args) {
         file: args.sourceFile,
         sourceComments: args.addSourceComments,
         omitSourceMapUrl: (args.generateSourceMaps == false),
-        outputStyle: "expanded"
+        outputStyle: "expanded",
+
+        functions: {
+            '@debug': function (msg) {
+                console.error(JSON.stringify({
+                    message: msg.getValue(),
+                    level: 0
+                }));
+                return sass.types.Null;
+            },
+            '@warn': function (msg) {
+                console.error(JSON.stringify({
+                    message: msg.getValue(),
+                    level: 1
+                }));
+                return sass.types.Null;
+            },
+            '@error': function (msg) {
+                console.error(JSON.stringify({
+                    message: msg.getValue(),
+                    level: 2
+                }));
+                return sass.types.Null;
+            }
+        }
     };
 
-    sass.render(options, function (error, sassResult) {
-        if (error) {
-            console.error(JSON.stringify({
-                file: error.file,
-                line: error.line,
-                column: error.column,
-                message: error.message,
-                status: ("SASS" + error.status)
-            }));
-            return;
+    sass.render(options, function (err, sassResult) {
+        if (err) {
+            throw JSON.stringify({
+                file: err.file,
+                line: err.line,
+                column: err.column,
+                message: err.message,
+                status: err.status
+            });
         }
 
         if (args.minify) {

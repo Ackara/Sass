@@ -1,0 +1,81 @@
+== basic.css.map
+==================================================
+{
+	"version": 3,
+	"file": "basic.css",
+	"sources": [
+		"../../samples/basic.scss"
+	],
+	"names": [],
+	"mappings": "AACA,4BAA4B;;AAE5B,AAAA,IAAI,EAAE,IAAI,CAAC;EACP,WAAW,EAAE,QAAQ;EACrB,MAAM,EAAE,IAAI;EACZ,KAAK,EAAE,IAAI;EACX,KAAK,EAAE,KAAK;CACf;;;AAED,AAAA,EAAE,CAAC;EACC,UAAU,EAAE,IAAI;CACnB;;;AAED,AAAA,EAAE,CAAC;EACC,MAAM,EAAE,GAAG;EACX,OAAO,EAAE,GAAG;CACf;;;AAED,AAAA,IAAI,CAAC;EACD,OAAO,EAAE,IAAI;CAChB;;;AAYD,AAVA,IAUI,EASJ,MAAM,EASN,KAAK,CA5BE;EACH,KAAK,EAAE,KAAK;EACZ,MAAM,EAAE,OAAO;EAGX,mBAAQ,EAAE,gBAAgB;EAC1B,mBAAQ,EAAE,KAAK;CAEtB;;;AAED,AAAA,IAAI,CAAC;EAED,gBAAgB,EAAE,OAAgB;CAKrC;;;AAPD,AAII,IAJA,AAIC,MAAM,CAAC;EACJ,gBAAgB,EAAE,GAAG;CACxB;;;AAGL,AAAA,MAAM,CAAC;EAEH,gBAAgB,EAAE,OAAkB;CAKvC;;;AAPD,AAII,MAJE,AAID,MAAM,CAAC;EACJ,gBAAgB,EAAE,KAAK;CAC1B;;;AAGL,AAAA,KAAK,CAAC;EAEF,gBAAgB,EAAE,OAAiB;CAKtC;;;AAPD,AAII,KAJC,AAIA,MAAM,CAAC;EACJ,gBAAgB,EAAE,IAAI;CACzB"
+}
+
+
+== basic.css
+==================================================
+/* this should be removed */
+/* line 4, samples/basic.scss */
+html, body {
+  font-family: Consolas;
+  height: 100%;
+  width: 100%;
+  color: black;
+}
+
+/* line 11, samples/basic.scss */
+ul {
+  list-style: none;
+}
+
+/* line 15, samples/basic.scss */
+li {
+  margin: 1px;
+  padding: 1em;
+}
+
+/* line 20, samples/basic.scss */
+.row {
+  display: flex;
+}
+
+/* line 24, samples/basic.scss */
+.red, .green, .blue {
+  color: white;
+  cursor: pointer;
+  transition-property: background-color;
+  transition-duration: 250ms;
+}
+
+/* line 34, samples/basic.scss */
+.red {
+  background-color: #ff4d4d;
+}
+
+/* line 38, samples/basic.scss */
+.red:hover {
+  background-color: red;
+}
+
+/* line 43, samples/basic.scss */
+.green {
+  background-color: #00cd00;
+}
+
+/* line 47, samples/basic.scss */
+.green:hover {
+  background-color: green;
+}
+
+/* line 52, samples/basic.scss */
+.blue {
+  background-color: #4d4dff;
+}
+
+/* line 56, samples/basic.scss */
+.blue:hover {
+  background-color: blue;
+}
+
+/*# sourceMappingURL=basic.css.map */
+
+

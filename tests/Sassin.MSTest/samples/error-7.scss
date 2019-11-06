@@ -1,0 +1,14 @@
+html, body {
+    background-color: white;
+}
+
+.blue {
+    opacity: 0.8;
+    font-size: $large;
+
+    &:hover {
+        opacity: 1;
+    }
+}
+
+@debug "fooo";

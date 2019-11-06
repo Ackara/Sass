@@ -20,29 +20,15 @@ namespace Acklann.Sassin
                 .First(x => x.Name.Equals(fileName, StringComparison.CurrentCultureIgnoreCase));
         }
 
-		public static FileInfo GetAppSCSS() => GetFile(@"app.scss");
 		public static FileInfo GetBasicSCSS() => GetFile(@"basic.scss");
-		public static FileInfo GetButtonsSCSS() => GetFile(@"base\_buttons.scss");
-		public static FileInfo GetLayoutSCSS() => GetFile(@"base\_layout.scss");
-		public static FileInfo GetResetSCSS() => GetFile(@"base\_reset.scss");
-		public static FileInfo GetStatesSCSS() => GetFile(@"base\_states.scss");
-		public static FileInfo GetTypographySCSS() => GetFile(@"base\_typography.scss");
-		public static FileInfo GetAllSCSS() => GetFile(@"modules\_all.scss");
-		public static FileInfo GetColorsSCSS() => GetFile(@"modules\_colors.scss");
-		public static FileInfo GetMixinsSCSS() => GetFile(@"modules\_mixins.scss");
+		public static FileInfo GetError7SCSS() => GetFile(@"error-7.scss");
+		public static FileInfo GetIndexHTML() => GetFile(@"index.html");
 
 		public struct File
 		{
-			public const string AppSCSS = @"app.scss";
 			public const string BasicSCSS = @"basic.scss";
-			public const string ButtonsSCSS = @"base\_buttons.scss";
-			public const string LayoutSCSS = @"base\_layout.scss";
-			public const string ResetSCSS = @"base\_reset.scss";
-			public const string StatesSCSS = @"base\_states.scss";
-			public const string TypographySCSS = @"base\_typography.scss";
-			public const string AllSCSS = @"modules\_all.scss";
-			public const string ColorsSCSS = @"modules\_colors.scss";
-			public const string MixinsSCSS = @"modules\_mixins.scss";
+			public const string Error7SCSS = @"error-7.scss";
+			public const string IndexHTML = @"index.html";
 		}
 	}	
 }
