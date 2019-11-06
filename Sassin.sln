@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sassin.VSIX", "src\Sassin.V
 EndProject
 Project("{F5034706-568F-408A-B7B3-4D38C6DB8A32}") = "build", "build\build.pssproj", "{6CAFC0C6-A428-4D30-A9F9-700E829FEA51}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".root", ".root", "{70C2E6E7-0A2D-41DD-8399-18BA22372EF5}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".misc", ".misc", "{70C2E6E7-0A2D-41DD-8399-18BA22372EF5}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
 		changelog.md = changelog.md

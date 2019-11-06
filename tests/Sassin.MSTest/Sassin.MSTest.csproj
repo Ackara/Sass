@@ -30,9 +30,6 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Sample.cs</LastGenOutput>
     </None>
-    <None Update="samples\app.scss">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Update="samples\basic.scss">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
