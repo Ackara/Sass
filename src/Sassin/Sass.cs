@@ -33,6 +33,15 @@ namespace Acklann.Sassin
             }
         }
 
+        public static IEnumerable<string> FindFiles(string fullPath)
+        {
+            if (!Directory.Exists(fullPath)) throw new DirectoryNotFoundException($"Could not find directory at '{fullPath}'.");
+
+            return from x in Directory.EnumerateFiles(fullPath, "*.scss", SearchOption.AllDirectories)
+                   where Path.GetFileName(x).StartsWith("_") == false
+                   select x;
+        }
+
         private static IEnumerable<string> GetGeneratedFiles(StreamReader reader)
         {
             JArray json; string line = null;

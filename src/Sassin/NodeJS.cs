@@ -8,7 +8,23 @@ namespace Acklann.Sassin
 {
     public class NodeJS
     {
-        public static readonly string InstallationDirectory = Path.Combine(AppContext.BaseDirectory, "tools");
+        static NodeJS()
+        {
+            string appdata = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            if (Directory.Exists(appdata))
+            {
+                InstallationDirectory = Path.Combine(appdata, nameof(Acklann));
+            }
+            else
+            {
+                InstallationDirectory = Path.Combine(AppContext.BaseDirectory, "tools");
+            }
+#if DEBUG
+            InstallationDirectory = Path.Combine(AppContext.BaseDirectory, "tools");
+#endif
+        }
+
+        public static readonly string InstallationDirectory;
 
         private static readonly string[] _dependencies = new string[]
                 {

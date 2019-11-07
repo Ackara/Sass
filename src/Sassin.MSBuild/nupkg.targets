@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <TraneleonRootDirectory>$([System.IO.Path]::GetDirectoryName($([System.IO.Path]::GetDirectoryName($([System.IO.Path]::GetDirectoryName($(MSBuildThisFileDirectory)))))))</TraneleonRootDirectory>
+    <CompileSassFilesOnBuild Condition="$(CompileSassFilesOnBuild)=''">true</CompileSassFilesOnBuild>
+  </PropertyGroup>
+
+  <PropertyGroup Label="compiler-options">
+    <SassCompilerShouldMinify Condition="$(SassCompilerShouldMinify)=''">true</SassCompilerShouldMinify>
+    <SassCompilerShouldGenerateSourceMap Condition="$(SassCompilerShouldGenerateSourceMap)=''">true</SassCompilerShouldGenerateSourceMap>
+    <SassCompilerShouldAddSourceComments Condition="$(SassCompilerShouldAddSourceComments)=''">true</SassCompilerShouldAddSourceComments>
+
+    <SassCompilerSuffix Condition="$(SassCompilerSuffix)=''"></SassCompilerSuffix>
+    <SassCompilerOutputDirectory Condition="$(SassCompilerOutputDirectory)=''"></SassCompilerOutputDirectory>
+    <SassCompilerSourceMapDirectory Condition="$(SassCompilerSourceMapDirectory)=''"></SassCompilerSourceMapDirectory>
+  </PropertyGroup>
+
+  <Target Name="CompileSassFilesBeforeBuild"
+          BeforeTargets="PreBuildEvent"
+          Condition="$(CompileSassFilesOnBuild)">
+    <CallTarget Targets="CompileSassFiles" UseResultsCache="true" />
+  </Target>
+
+  <Target Name="CompileSassFiles">
+    <CompileSassTask ProjectDirectory="$(MSBuildProjectFullPath)"
+                     Minify="$(SassCompilerShouldMinify)"
+                     Suffix="$(SassCompilerSuffix)"
+                     OutputDirectory="$(SassCompilerOutputDirectory)"
+                     AddSourceComments="$(SassCompilerShouldAddSourceComments)"
+                     GenerateSourceMaps="$(SassCompilerShouldGenerateSourceMap)"
+                     SourceMapDirectory="$(SassCompilerSourceMapDirectory)" />
+  </Target>
+
+  <UsingTask AssemblyFile="$(TraneleonRootDirectory)\tools\netstandard2.0\Acklann.Traneleon.dll" TaskName="CompileSassTask" />
+</Project>

@@ -2,8 +2,13 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <RootNamespace>Acklann.Sassin</RootNamespace>
+    <RootNamespace>Acklann.Sassin.MSBuild</RootNamespace>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Acklann.GlobN" Version="2.1.7" />
+    <PackageReference Include="Microsoft.Build.Framework" Version="16.3.0" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Sassin\Sassin.csproj" />

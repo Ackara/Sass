@@ -22,6 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Sassin.MSBuild\Sassin.MSBuild.csproj" />
     <ProjectReference Include="..\..\src\Sassin\Sassin.csproj" />
   </ItemGroup>
 
@@ -29,6 +30,9 @@
     <None Update="Sample.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Sample.cs</LastGenOutput>
+    </None>
+    <None Update="samples\base\_layout.scss">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="samples\basic.scss">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

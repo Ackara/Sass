@@ -89,6 +89,21 @@ namespace Acklann.Sassin.Tests
             error.Message.ShouldNotBeNullOrEmpty();
         }
 
+        [TestMethod]
+        public void Can_find_sass_files_within_folder()
+        {
+            // Arrange
+            var folder = Sample.DirectoryName;
+
+            // Act
+            var result = Sass.FindFiles(folder);
+
+            // Assert
+            result.ShouldNotBeEmpty();
+            result.ShouldAllBe(x => x.EndsWith(".scss"));
+            result.ShouldAllBe(x => Path.GetFileName(x).StartsWith('_') == false);
+        }
+
         // ==================== DATA ==================== //
 
         private static IEnumerable<object[]> GetCompilierOptions()

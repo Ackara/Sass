@@ -25,7 +25,7 @@ namespace Acklann.Sassin
             return string.Concat(
                 escape(OutputDirectory), " ",
                 escape(SourceMapDirectory), " ",
-                
+
                 escape(Suffix), " ",
                 toJs(Minify), " ",
 

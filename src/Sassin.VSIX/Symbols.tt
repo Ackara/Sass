@@ -1,0 +1,81 @@
+<#@ template language="C#" debug="True" hostspecific="true" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly name="System.IO" #>
+<#@ assembly name="System.Xml" #>
+<#@ assembly name="System.Xml.Linq" #>
+<#@ assembly name="System.Text.RegularExpressions" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="System.Xml" #>
+<#@ import namespace="System.Xml.Linq" #>
+<#@ import namespace="System.Xml.XPath" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text.RegularExpressions" #>
+<#@ output extension="cs" #>
+using System;
+
+namespace <#= Host.ResolveAssemblyReference("$(RootNamespace)") #>
+{
+	public static class <#= Path.GetFileNameWithoutExtension(Host.TemplateFile) #>
+	{
+		public const string ProductName = "<#= Host.ResolveAssemblyReference("$(Product)") #>";
+
+		<# GenerateMembers(); #>
+	}
+}
+<#+
+void GenerateMembers()
+{
+	string vsctFile = Directory.GetFiles(Path.GetDirectoryName(Host.TemplateFile), "*.vsct")[0];
+	if (File.Exists(vsctFile))
+	{
+		using(var reader = XmlReader.Create(vsctFile))
+		{
+			var xmlns = new XmlNamespaceManager(reader.NameTable);
+			xmlns.AddNamespace("vs", "http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable");
+
+			var doc = XDocument.Load(reader);
+			var symbols = doc.XPathSelectElements("/vs:CommandTable/vs:Symbols/vs:GuidSymbol", xmlns);
+			if (symbols != null)
+			{
+				PushIndent("\t\t");
+				foreach (var guid in symbols)
+				{
+					WriteLine($"public struct {guid.Attribute("name").Value}");
+					WriteLine("{");
+					PushIndent("\t");
+
+					WriteLine($"public const string GuidString = \"{guid.Attribute("value").Value.Trim('{', '}')}\";");
+					WriteLine($"public static readonly Guid Guid = new Guid(\"{guid.Attribute("value").Value.Trim('{', '}')}\");");
+
+					foreach (var id in guid.Elements())
+					{
+						WriteLine($"public const int {id.Attribute("name").Value} = {id.Attribute("value").Value};");
+					}
+
+					PopIndent();
+					WriteLine("}");
+				}
+
+				PopIndent();
+			}
+		}
+	}
+}
+
+string GetProjectInfo(string elementName)
+{
+	var doc = XDocument.Load(Directory.GetFiles(Path.GetDirectoryName(Host.TemplateFile), "*.csproj", SearchOption.TopDirectoryOnly)[0]);
+	XNamespace ns = "http://schemas.microsoft.com/developer/msbuild/2003";
+
+	string value = (from e in doc.Descendants(ns + elementName) select e.Value).FirstOrDefault();
+	if (string.IsNullOrEmpty(value))
+	{
+		value = (from e in doc.Descendants(elementName) select e.Value).First();
+	}
+
+	return value;
+}
+
+#>
