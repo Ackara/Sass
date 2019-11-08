@@ -1,6 +1,6 @@
 namespace Acklann.Sassin
 {
-    public enum ErrorLevel
+    public enum ErrorSeverity
     {
         Debug,
         Warning,

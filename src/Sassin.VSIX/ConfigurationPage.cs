@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace Acklann.Sass
+namespace Acklann.Sassin
 {
 	public class ConfigurationPage : DialogPage
 	{

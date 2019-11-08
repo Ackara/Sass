@@ -21,8 +21,8 @@
     <ProjectGuid>{53CD0B94-7689-4F37-8E36-2674C3B362D5}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Acklann.Sass</RootNamespace>
-    <AssemblyName>Sass.VSIX</AssemblyName>
+    <RootNamespace>Acklann.Sassin</RootNamespace>
+    <AssemblyName>Sassin.VSIX</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <GeneratePkgDefFile>true</GeneratePkgDefFile>
     <IncludeAssemblyInVSIXContainer>true</IncludeAssemblyInVSIXContainer>
@@ -56,6 +56,7 @@
     <Compile Include="ConfigurationPage.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="SassWatcher.cs" />
     <Compile Include="Symbols.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

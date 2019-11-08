@@ -80,7 +80,7 @@ namespace Acklann.Sassin
                     (json["file"]?.Value<string>() ?? default),
                     (json["line"]?.Value<int>() ?? default),
                     (json["column"]?.Value<int>() ?? default),
-                    ((ErrorLevel)(json["level"]?.Value<int>() ?? (int)ErrorLevel.Error)),
+                    ((ErrorSeverity)(json["level"]?.Value<int>() ?? (int)ErrorSeverity.Error)),
                     (json["status"]?.Value<int>() ?? default)
                 );
             }

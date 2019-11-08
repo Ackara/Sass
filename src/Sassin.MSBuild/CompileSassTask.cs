@@ -3,9 +3,9 @@ using System.IO;
 
 namespace Acklann.Sassin.MSBuild
 {
-    public class TranspileTask : ITask
+    public class CompileSassTask : ITask
     {
-        public TranspileTask()
+        public CompileSassTask()
         {
             Suffix = string.Empty;
             Minify = GenerateSourceMaps = AddSourceComments = true;
@@ -52,7 +52,6 @@ namespace Acklann.Sassin.MSBuild
 
         private void LogMessage(CompilerResult result)
         {
-
         }
 
         private void LogMessage(string format, MessageImportance level = MessageImportance.Normal)
@@ -60,7 +59,7 @@ namespace Acklann.Sassin.MSBuild
             BuildEngine.LogMessageEvent(new BuildMessageEventArgs(
                 format,
                 string.Empty,
-                nameof(TranspileTask),
+                nameof(CompileSassTask),
                 level));
         }
 
@@ -68,7 +67,7 @@ namespace Acklann.Sassin.MSBuild
         {
             switch (error.Severity)
             {
-                case ErrorLevel.Error:
+                case ErrorSeverity.Error:
                     BuildEngine.LogErrorEvent(new BuildErrorEventArgs(
                         string.Empty,
                         $"{error.StatusCode}",
@@ -78,10 +77,10 @@ namespace Acklann.Sassin.MSBuild
                         0, 0,
                         error.Message,
                         string.Empty,
-                        nameof(TranspileTask)));
+                        nameof(CompileSassTask)));
                     break;
 
-                case ErrorLevel.Warning:
+                case ErrorSeverity.Warning:
                     BuildEngine.LogWarningEvent(new BuildWarningEventArgs(
                         string.Empty,
                         $"{error.StatusCode}",
@@ -91,7 +90,7 @@ namespace Acklann.Sassin.MSBuild
                         0, 0,
                         error.Message,
                         string.Empty,
-                        nameof(TranspileTask)));
+                        nameof(CompileSassTask)));
                     break;
             }
         }

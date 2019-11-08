@@ -2,7 +2,7 @@ namespace Acklann.Sassin
 {
     public readonly struct CompilerError
     {
-        public CompilerError(string message, string file, int line, int column, ErrorLevel severity = ErrorLevel.Error, int code = default)
+        public CompilerError(string message, string file, int line, int column, ErrorSeverity severity = ErrorSeverity.Error, int code = default)
         {
             Severity = severity;
             Message = message;
@@ -12,7 +12,7 @@ namespace Acklann.Sassin
             Column = column;
         }
 
-        public ErrorLevel Severity { get; }
+        public ErrorSeverity Severity { get; }
 
         public int StatusCode { get; }
 

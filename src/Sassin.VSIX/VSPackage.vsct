@@ -14,10 +14,12 @@
     </Groups>
 
     <Buttons>
-      <Button guid="CmdSet" id="CompileSassCommandId" priority="0x0100" type="Button">
-        <Parent guid="CmdSet" id="MyMenuGroup" />
+      <Button guid="CmdSet" id="CompileSassFileCommandId" priority="0x0100" type="Button">
+        <Icon guid="ImageCatalogGuid" id="Compile"/>
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
-          <ButtonText>Invoke CompileSassCommand</ButtonText>
+          <ButtonText>Compile</ButtonText>
         </Strings>
       </Button>
     </Buttons>
@@ -28,7 +30,7 @@
 
     <GuidSymbol name="CmdSet" value="{f5f3a3ba-35a2-4f98-a0f3-bd33eefeb63d}">
       <IDSymbol name="MyMenuGroup" value="0x1020" />
-      <IDSymbol name="CompileSassCommandId" value="0x0100" />
+      <IDSymbol name="CompileSassFileCommandId" value="0x0100" />
     </GuidSymbol>
   </Symbols>
 </CommandTable>

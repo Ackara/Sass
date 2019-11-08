@@ -6,6 +6,8 @@ using System.Reflection;
 
 namespace Acklann.Sassin
 {
+    public delegate void ProgressHandler(string message, int progress, int max);
+
     public class NodeJS
     {
         static NodeJS()
@@ -27,7 +29,7 @@ namespace Acklann.Sassin
         public static readonly string InstallationDirectory;
 
         private static readonly string[] _dependencies = new string[]
-                {
+        {
             "node-sass@4.13.0", "csso@4.0.1", "multi-stage-sourcemap@0.3.1"
         };
 
@@ -54,14 +56,28 @@ namespace Acklann.Sassin
             finally { npm.Dispose(); }
         }
 
-        public static void Install(bool overwrite = false)
+        public static void Install(ProgressHandler handler = default, bool overwrite = false)
         {
+            int progress = 0, goal = (_dependencies.Length + 1);
+
             string modulesFolder = Path.Combine(InstallationDirectory, "node_modules");
             if (!Directory.Exists(modulesFolder))
-                InstallModules();
+                InstallModules(handler, ref progress, goal);
 
             if (!Directory.EnumerateFiles(InstallationDirectory, "*.js").Any())
-                ExtractBinaries(overwrite);
+                ExtractBinaries(handler, ref progress, goal, overwrite);
+        }
+
+        public static bool TryInstall(ProgressHandler handler = default, bool overwrite = false)
+        {
+            try
+            {
+                Install(handler, overwrite);
+                return true;
+            }
+            catch { }
+
+            return false;
         }
 
         public static Process Execute(string command, bool doNotWait = false)
@@ -89,7 +105,7 @@ namespace Acklann.Sassin
             return new Process() { StartInfo = info };
         }
 
-        private static void ExtractBinaries(bool overwrite = false)
+        private static void ExtractBinaries(ProgressHandler handler, ref int progress, int goal, bool overwrite = false)
         {
             Assembly assembly = typeof(NodeJS).Assembly;
             string extension;
@@ -101,6 +117,9 @@ namespace Acklann.Sassin
                     case ".json":
                         string baseName = Path.GetFileNameWithoutExtension(name);
                         string fullPath = Path.Combine(InstallationDirectory, $"{baseName.Substring(baseName.LastIndexOf('.') + 1)}{extension}");
+
+                        handler?.Invoke(string.Format(messageFormat, progress, goal, (progress / goal), $"extracting {name}"), progress, goal);
+                        progress++;
 
                         if (baseName.EndsWith("-lock.", StringComparison.OrdinalIgnoreCase)) continue;
                         else if (overwrite || !File.Exists(fullPath))
@@ -114,7 +133,7 @@ namespace Acklann.Sassin
                 }
         }
 
-        private static void InstallModules()
+        private static void InstallModules(ProgressHandler handler, ref int progress, int goal)
         {
             Process npm = null;
 
@@ -126,6 +145,9 @@ namespace Acklann.Sassin
 
                 foreach (string item in _dependencies)
                 {
+                    handler?.Invoke(string.Format(messageFormat, progress, goal, (progress / goal), $"npm install {item}"), progress, goal);
+                    progress++;
+
                     npm.StartInfo.Arguments = $"/c npm install {item} --save-dev";
                     npm.Start();
                     npm.WaitForExit();
@@ -138,5 +160,11 @@ namespace Acklann.Sassin
             }
             finally { npm?.Dispose(); }
         }
+
+        #region Backing Members
+
+        private const string messageFormat = "loading dependencies {0}/{1} ({2:0%}) ({3})";
+
+        #endregion Backing Members
     }
 }
