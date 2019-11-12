@@ -15,8 +15,11 @@ namespace Acklann.Sassin
 		{
 			public const string GuidString = "f5f3a3ba-35a2-4f98-a0f3-bd33eefeb63d";
 			public static readonly Guid Guid = new Guid("f5f3a3ba-35a2-4f98-a0f3-bd33eefeb63d");
-			public const int MyMenuGroup = 0x1020;
-			public const int CompileSassCommandId = 0x0100;
+			public const int ToolsMenuGroup = 0x101;
+			public const int ExtensionsMenuGroup = 0x102;
+			public const int FileCommandGroup = 0x103;
+			public const int GotoSettingsommandId = 0x0500;
+			public const int CompileSassFileCommandId = 0x0501;
 		}
 	}
 }

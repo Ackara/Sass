@@ -23,12 +23,14 @@ namespace Acklann.Sassin
 		public static FileInfo GetBasicSCSS() => GetFile(@"basic.scss");
 		public static FileInfo GetError7SCSS() => GetFile(@"error-7.scss");
 		public static FileInfo GetIndexHTML() => GetFile(@"index.html");
+		public static FileInfo GetLayoutSCSS() => GetFile(@"base\_layout.scss");
 
 		public struct File
 		{
 			public const string BasicSCSS = @"basic.scss";
 			public const string Error7SCSS = @"error-7.scss";
 			public const string IndexHTML = @"index.html";
+			public const string LayoutSCSS = @"base\_layout.scss";
 		}
 	}	
 }

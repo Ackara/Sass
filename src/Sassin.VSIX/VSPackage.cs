@@ -1,66 +1,68 @@
-﻿using System;
-using System.ComponentModel.Design;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
-using System.Runtime.InteropServices;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using EnvDTE80;
 using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.Win32;
-using Acklann.Sassin;
-using Microsoft.VisualStudio.Shell.Events;
-using Constants = Microsoft.VisualStudio.Shell.Interop.Constants;
+using System;
+using System.ComponentModel.Design;
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.InteropServices;
+using System.Threading;
 using Task = System.Threading.Tasks.Task;
-using EnvDTE80;
 
 namespace Acklann.Sassin
 {
     [Guid(Symbols.Package.GuidString)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
+    [InstalledProductRegistration("#110", "#112", "0.0.1", IconResourceID = 400)]
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
+    [ProvideOptionPage(typeof(ConfigurationPage), Symbols.ProductName, "General", 0, 0, true)]
+    [ProvideAutoLoad(VSConstants.UICONTEXT.SolutionExistsAndFullyLoaded_string, PackageAutoLoadFlags.BackgroundLoad)]
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "pkgdef, VS and vsixmanifest are valid VS terms")]
     public sealed class VSPackage : AsyncPackage
     {
-
-
         protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
-            // When initialized asynchronously, the current thread may be a background thread at this point.
-            // Do any initialization that requires the UI thread after switching to the UI thread.
-            await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+            bool hasDependencies = NodeJS.CheckInstallation();
 
-
-            _dte = (DTE2)await GetServiceAsync(typeof(EnvDTE.DTE));
-
-            _dte?.StatusBar.Animate(true, Constants.SBAI_General);
-            if (NodeJS.TryInstall(onProgressUpdate))
+            if (hasDependencies)
             {
-                
+                NodeJS.Install((msg, _, __) => { System.Diagnostics.Debug.WriteLine(msg); });
+
+                var dte = (DTE2)await GetServiceAsync(typeof(EnvDTE.DTE));
+
+                var commandService = (await GetServiceAsync(typeof(IMenuCommandService)) as OleMenuCommandService);
+                commandService.AddCommand(new OleMenuCommand(OnCompileSassFileCommandInvoked, new CommandID(Symbols.CmdSet.Guid, Symbols.CmdSet.CompileSassFileCommandId)));
+
+                await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+                var outputWindow = (IVsOutputWindow)await GetServiceAsync(typeof(SVsOutputWindow));
+                if (outputWindow != null)
+                {
+                    var guid = new Guid("455e712c-1c5a-43b9-8c70-7f8e9e0ec4f6");
+                    outputWindow.CreatePane(ref guid, Symbols.ProductName, 1, 1);
+                    outputWindow.GetPane(ref guid, out IVsOutputWindowPane pane);
+
+                    _fileWatcher = new SassWatcher(this, pane, dte?.StatusBar);
+                }
+
+                return;
             }
 
-            _dte?.StatusBar.Animate(false, Constants.SBAI_General);
-            void onProgressUpdate(string message, int progres, int goal)
-            {
-                _dte?.StatusBar.Progress(progres != goal, $"{Symbols.ProductName} {message} ...", progres, goal);
-            }
+            await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+            System.Windows.Forms.MessageBox.Show($"{Symbols.ProductName} was not loaded; Node Package Manager (NPM) is not installed on this machine.");
         }
 
-        private void OnSolutionLoaded(object sender, OpenSolutionEventArgs e = null)
-        {
+        // ==================== Event Handlers ==================== //
 
+        private void OnCompileSassFileCommandInvoked(object sender, EventArgs e)
+        {
+            System.Diagnostics.Debug.WriteLine(nameof(OnCompileSassFileCommandInvoked));
         }
 
         #region Backing Members
 
-        private DTE2 _dte;
-        private IVsSolution _solution;
-        private ErrorListProvider _errorList;
+        internal DTE2 VS;
+        private SassWatcher _fileWatcher;
 
-
-        #endregion
+        #endregion Backing Members
     }
 }

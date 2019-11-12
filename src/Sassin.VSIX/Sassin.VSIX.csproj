@@ -52,7 +52,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="CompileSassCommand.cs" />
     <Compile Include="ConfigurationPage.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -71,6 +70,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="acklann.globn">
+      <Version>2.1.7</Version>
+    </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.SDK" Version="16.0.202" ExcludeAssets="runtime" />
     <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="16.3.2099" />
   </ItemGroup>

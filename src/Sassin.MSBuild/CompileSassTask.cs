@@ -38,9 +38,9 @@ namespace Acklann.Sassin.MSBuild
                 SourceMapDirectory = SourceMapDirectory
             };
 
-            foreach (string sassFile in Sass.FindFiles(ProjectDirectory))
+            foreach (string sassFile in SassCompiler.FindFiles(ProjectDirectory))
             {
-                CompilerResult result = Sass.Compile(sassFile, options);
+                CompilerResult result = SassCompiler.Compile(sassFile, options);
 
                 if (result.Success) LogMessage(result);
 

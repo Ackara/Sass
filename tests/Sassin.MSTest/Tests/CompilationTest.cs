@@ -37,7 +37,7 @@ namespace Acklann.Sassin.Tests
             options.OutputDirectory = cwd;
 
             // Act
-            var result = Sass.Compile(Sample.GetBasicSCSS().FullName, options);
+            var result = SassCompiler.Compile(Sample.GetBasicSCSS().FullName, options);
             var totalFiles = Directory.GetFiles(cwd, "*").Length;
 
             var builder = new StringBuilder();
@@ -76,7 +76,7 @@ namespace Acklann.Sassin.Tests
             };
 
             // Act
-            var result = Sass.Compile(documentPath, options);
+            var result = SassCompiler.Compile(documentPath, options);
             var error = result.Errors.FirstOrDefault();
 
             // Assert
@@ -96,7 +96,7 @@ namespace Acklann.Sassin.Tests
             var folder = Sample.DirectoryName;
 
             // Act
-            var result = Sass.FindFiles(folder);
+            var result = SassCompiler.FindFiles(folder);
 
             // Assert
             result.ShouldNotBeEmpty();

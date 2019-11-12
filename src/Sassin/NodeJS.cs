@@ -12,18 +12,12 @@ namespace Acklann.Sassin
     {
         static NodeJS()
         {
-            string appdata = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            if (Directory.Exists(appdata))
-            {
-                InstallationDirectory = Path.Combine(appdata, nameof(Acklann));
-            }
-            else
-            {
-                InstallationDirectory = Path.Combine(AppContext.BaseDirectory, "tools");
-            }
+            InstallationDirectory = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            if (Directory.Exists(InstallationDirectory) == false) InstallationDirectory = Path.GetDirectoryName(typeof(NodeJS).Assembly.Location);
 #if DEBUG
-            InstallationDirectory = Path.Combine(AppContext.BaseDirectory, "tools");
+            InstallationDirectory = Path.GetDirectoryName(typeof(NodeJS).Assembly.Location);
 #endif
+            InstallationDirectory = Path.Combine(InstallationDirectory, "tools");
         }
 
         public static readonly string InstallationDirectory;
@@ -56,9 +50,19 @@ namespace Acklann.Sassin
             finally { npm.Dispose(); }
         }
 
+        public static Process Execute(string command, bool doNotWait = false)
+        {
+            if (string.IsNullOrEmpty(command)) throw new ArgumentNullException(nameof(command));
+
+            Process cmd = GetStartInfo(command);
+            cmd.Start();
+            if (doNotWait == false) cmd.WaitForExit();
+            return cmd;
+        }
+
         public static void Install(ProgressHandler handler = default, bool overwrite = false)
         {
-            int progress = 0, goal = (_dependencies.Length + 1);
+            int progress = 1, goal = (_dependencies.Length + 1);
 
             string modulesFolder = Path.Combine(InstallationDirectory, "node_modules");
             if (!Directory.Exists(modulesFolder))
@@ -75,19 +79,9 @@ namespace Acklann.Sassin
                 Install(handler, overwrite);
                 return true;
             }
-            catch { }
+            catch (Exception ex) { System.Diagnostics.Debug.WriteLine(ex.Message); }
 
             return false;
-        }
-
-        public static Process Execute(string command, bool doNotWait = false)
-        {
-            if (string.IsNullOrEmpty(command)) throw new ArgumentNullException(nameof(command));
-
-            Process cmd = GetStartInfo(command);
-            cmd.Start();
-            if (doNotWait == false) cmd.WaitForExit();
-            return cmd;
         }
 
         private static Process GetStartInfo(string command = null)
@@ -105,34 +99,6 @@ namespace Acklann.Sassin
             return new Process() { StartInfo = info };
         }
 
-        private static void ExtractBinaries(ProgressHandler handler, ref int progress, int goal, bool overwrite = false)
-        {
-            Assembly assembly = typeof(NodeJS).Assembly;
-            string extension;
-
-            foreach (string name in assembly.GetManifestResourceNames())
-                switch (extension = Path.GetExtension(name).ToLowerInvariant())
-                {
-                    case ".js":
-                    case ".json":
-                        string baseName = Path.GetFileNameWithoutExtension(name);
-                        string fullPath = Path.Combine(InstallationDirectory, $"{baseName.Substring(baseName.LastIndexOf('.') + 1)}{extension}");
-
-                        handler?.Invoke(string.Format(messageFormat, progress, goal, (progress / goal), $"extracting {name}"), progress, goal);
-                        progress++;
-
-                        if (baseName.EndsWith("-lock.", StringComparison.OrdinalIgnoreCase)) continue;
-                        else if (overwrite || !File.Exists(fullPath))
-                            using (Stream stream = assembly.GetManifestResourceStream(name))
-                            using (var file = new FileStream(fullPath, FileMode.Create, FileAccess.Write, FileShare.Read))
-                            {
-                                stream.CopyTo(file);
-                                stream.Flush();
-                            }
-                        break;
-                }
-        }
-
         private static void InstallModules(ProgressHandler handler, ref int progress, int goal)
         {
             Process npm = null;
@@ -145,7 +111,7 @@ namespace Acklann.Sassin
 
                 foreach (string item in _dependencies)
                 {
-                    handler?.Invoke(string.Format(messageFormat, progress, goal, (progress / goal), $"npm install {item}"), progress, goal);
+                    handler?.Invoke(string.Format(messageFormat, progress, goal, (progress / (float)goal), $"npm install {item}"), progress, goal);
                     progress++;
 
                     npm.StartInfo.Arguments = $"/c npm install {item} --save-dev";
@@ -161,9 +127,37 @@ namespace Acklann.Sassin
             finally { npm?.Dispose(); }
         }
 
+        private static void ExtractBinaries(ProgressHandler handler, ref int progress, int goal, bool overwrite = false)
+        {
+            Assembly assembly = typeof(NodeJS).Assembly;
+            string extension;
+
+            foreach (string name in assembly.GetManifestResourceNames())
+                switch (extension = Path.GetExtension(name).ToLowerInvariant())
+                {
+                    case ".js":
+                    case ".json":
+                        string baseName = Path.GetFileNameWithoutExtension(name);
+                        string fullPath = Path.Combine(InstallationDirectory, $"{baseName.Substring(baseName.LastIndexOf('.') + 1)}{extension}");
+
+                        handler?.Invoke(string.Format(messageFormat, progress, goal, (progress / (float)goal), $"extracting {name}"), progress, goal);
+                        progress++;
+
+                        if (baseName.EndsWith("-lock.", StringComparison.OrdinalIgnoreCase)) continue;
+                        else if (overwrite || !File.Exists(fullPath))
+                            using (Stream stream = assembly.GetManifestResourceStream(name))
+                            using (var file = new FileStream(fullPath, FileMode.Create, FileAccess.Write, FileShare.Read))
+                            {
+                                stream.CopyTo(file);
+                                stream.Flush();
+                            }
+                        break;
+                }
+        }
+
         #region Backing Members
 
-        private const string messageFormat = "loading dependencies {0}/{1} ({2:0%}) ({3})";
+        private const string messageFormat = "loading dependencies {0}/{1} {2:0%} ({3}) ...";
 
         #endregion Backing Members
     }

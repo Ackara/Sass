@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Acklann.Sassin
 {
-    public class Sass
+    public class SassCompiler
     {
         public static CompilerResult Compile(string sassFilePath, CompilerOptions options)
         {
@@ -33,11 +33,11 @@ namespace Acklann.Sassin
             }
         }
 
-        public static IEnumerable<string> FindFiles(string fullPath)
+        public static IEnumerable<string> FindFiles(string directoryPath)
         {
-            if (!Directory.Exists(fullPath)) throw new DirectoryNotFoundException($"Could not find directory at '{fullPath}'.");
+            if (!Directory.Exists(directoryPath)) throw new DirectoryNotFoundException($"Could not find directory at '{directoryPath}'.");
 
-            return from x in Directory.EnumerateFiles(fullPath, "*.scss", SearchOption.AllDirectories)
+            return from x in Directory.EnumerateFiles(directoryPath, "*.scss", SearchOption.AllDirectories)
                    where Path.GetFileName(x).StartsWith("_") == false
                    select x;
         }

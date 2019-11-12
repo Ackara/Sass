@@ -8,14 +8,12 @@
 
   <Commands package="Package">
     <Groups>
-      <Group guid="CmdSet" id="MyMenuGroup" priority="0x0600">
-        <Parent guid="guidSHLMainMenu" id="IDM_VS_MENU_TOOLS" />
-      </Group>
+      <Group guid="CmdSet" id="FileCommandGroup" />
     </Groups>
 
     <Buttons>
       <Button guid="CmdSet" id="CompileSassFileCommandId" priority="0x0100" type="Button">
-        <Icon guid="ImageCatalogGuid" id="Compile"/>
+        <Icon guid="ImageCatalogGuid" id="Compile" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
@@ -25,12 +23,27 @@
     </Buttons>
   </Commands>
 
+  <CommandPlacements>
+    <CommandPlacement guid="CmdSet" id="FileCommandGroup" priority="3">
+      <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_ITEMNODE" />
+    </CommandPlacement>
+
+    <CommandPlacement guid="CmdSet" id="CompileSassFileCommandId" priority="1">
+      <Parent guid="CmdSet" id="FileCommandGroup" />
+    </CommandPlacement>
+  </CommandPlacements>
+
   <Symbols>
     <GuidSymbol name="Package" value="{235471ab-a770-4d0e-b00b-4f80bb01f200}" />
 
     <GuidSymbol name="CmdSet" value="{f5f3a3ba-35a2-4f98-a0f3-bd33eefeb63d}">
-      <IDSymbol name="MyMenuGroup" value="0x1020" />
-      <IDSymbol name="CompileSassFileCommandId" value="0x0100" />
+      <IDSymbol name="ToolsMenuGroup" value="0x101" />
+      <IDSymbol name="ExtensionsMenuGroup" value="0x102" />
+
+      <IDSymbol name="FileCommandGroup" value="0x103" />
+
+      <IDSymbol name="GotoSettingsommandId" value="0x0500" />
+      <IDSymbol name="CompileSassFileCommandId" value="0x0501" />
     </GuidSymbol>
   </Symbols>
 </CommandTable>
