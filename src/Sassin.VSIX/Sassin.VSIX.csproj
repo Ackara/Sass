@@ -55,6 +55,7 @@
     <Compile Include="ConfigurationPage.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Helper.cs" />
     <Compile Include="SassWatcher.cs" />
     <Compile Include="Symbols.cs">
       <AutoGen>True</AutoGen>

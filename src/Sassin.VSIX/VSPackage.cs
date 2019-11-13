@@ -28,7 +28,7 @@ namespace Acklann.Sassin
             {
                 NodeJS.Install((msg, _, __) => { System.Diagnostics.Debug.WriteLine(msg); });
 
-                var dte = (DTE2)await GetServiceAsync(typeof(EnvDTE.DTE));
+                VS = (DTE2)await GetServiceAsync(typeof(EnvDTE.DTE));
 
                 var commandService = (await GetServiceAsync(typeof(IMenuCommandService)) as OleMenuCommandService);
                 commandService.AddCommand(new OleMenuCommand(OnCompileSassFileCommandInvoked, new CommandID(Symbols.CmdSet.Guid, Symbols.CmdSet.CompileSassFileCommandId)));
@@ -41,7 +41,7 @@ namespace Acklann.Sassin
                     outputWindow.CreatePane(ref guid, Symbols.ProductName, 1, 1);
                     outputWindow.GetPane(ref guid, out IVsOutputWindowPane pane);
 
-                    _fileWatcher = new SassWatcher(this, pane, dte?.StatusBar);
+                    _fileWatcher = new SassWatcher(this, pane, VS?.StatusBar);
                 }
 
                 return;
@@ -55,7 +55,7 @@ namespace Acklann.Sassin
 
         private void OnCompileSassFileCommandInvoked(object sender, EventArgs e)
         {
-            System.Diagnostics.Debug.WriteLine(nameof(OnCompileSassFileCommandInvoked));
+            string selectedFile = VS.GetSelectedFile();
         }
 
         #region Backing Members

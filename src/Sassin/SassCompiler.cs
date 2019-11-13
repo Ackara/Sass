@@ -21,6 +21,7 @@ namespace Acklann.Sassin
             if (!string.IsNullOrEmpty(options.SourceMapDirectory) && !Directory.Exists(options.SourceMapDirectory))
                 Directory.CreateDirectory(options.SourceMapDirectory);
 
+            long start = System.DateTime.Now.Ticks;
             using (Process node = NodeJS.Execute($"/c node \"{compiler}\" \"{sassFilePath}\" {options.ToArgs()}"))
             {
                 return new CompilerResult
@@ -28,7 +29,8 @@ namespace Acklann.Sassin
                     SourceFile = sassFilePath,
                     Success = (node.ExitCode == 0),
                     Errors = GetErrors(node.StandardError).ToArray(),
-                    GeneratedFiles = GetGeneratedFiles(node.StandardOutput).ToArray()
+                    GeneratedFiles = GetGeneratedFiles(node.StandardOutput).ToArray(),
+                    Elapse = System.TimeSpan.FromTicks(System.DateTime.Now.Ticks - start)
                 };
             }
         }

@@ -17,6 +17,8 @@ namespace Acklann.Sassin
             }
         }
 
+        public System.TimeSpan Elapse { get; set; }
+
         public string[] GeneratedFiles { get; set; }
 
         public CompilerError[] Errors { get; set; }

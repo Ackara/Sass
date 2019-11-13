@@ -59,7 +59,10 @@ namespace Acklann.Sassin
             int n = documents.Length;
             for (int i = 0; i < n; i++)
             {
+                _statusBar.Text = $"{Symbols.ProductName} compiling {Path.GetFileName(documents[i])} ...";
                 CompilerResult result = SassCompiler.Compile(documents[i], options);
+                _statusBar.Text = $"{Symbols.ProductName} compilation complete.";
+
                 foreach (CompilerError item in result.Errors)
                 {
                     if (item.Severity == ErrorSeverity.Debug)
@@ -101,7 +104,7 @@ namespace Acklann.Sassin
 
         public int OnAfterSave(uint docCookie)
         {
-            ThreadHelper.ThrowIfNotOnUIThread();
+            //ThreadHelper.ThrowIfNotOnUIThread();
 
             RunningDocumentInfo document = _runningDocumentTable.GetDocumentInfo(docCookie);
             string fileName = Path.GetFileName(document.Moniker);
