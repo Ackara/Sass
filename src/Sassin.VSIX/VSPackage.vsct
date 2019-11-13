@@ -8,42 +8,85 @@
 
   <Commands package="Package">
     <Groups>
+      <Group guid="CmdSet" id="VSMainMenuGroup" />
       <Group guid="CmdSet" id="FileCommandGroup" />
+      <Group guid="CmdSet" id="ProjectCommandGroup" />
     </Groups>
 
+    <Menus>
+      <Menu guid="CmdSet" id="MainMenu" priority="100">
+        <Parent guid="CmdSet" id="VSMainMenuGroup" />
+        <Strings>
+          <ButtonText>Sassin</ButtonText>
+        </Strings>
+      </Menu>
+    </Menus>
+
     <Buttons>
-      <Button guid="CmdSet" id="CompileSassFileCommandId" priority="0x0100" type="Button">
+      <Button guid="CmdSet" id="CompileSassFileCommandId" priority="1" type="Button">
         <Icon guid="ImageCatalogGuid" id="Compile" />
         <CommandFlag>IconIsMoniker</CommandFlag>
+        <CommandFlag>DefaultInvisible</CommandFlag>
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <ButtonText>Compile</ButtonText>
+        </Strings>
+      </Button>
+
+      <Button guid="CmdSet" id="InstallNugetPackageCommandId" priority="2" type="Button">
+        <Icon guid="ImageCatalogGuid" id="NuGet" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <CommandFlag>DefaultDisabled</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <ButtonText>Setup Compile Sass On Build</ButtonText>
         </Strings>
       </Button>
     </Buttons>
   </Commands>
 
   <CommandPlacements>
+    <CommandPlacement guid="CmdSet" id="VSMainMenuGroup" priority="600">
+      <Parent guid="guidSHLMainMenu" id="IDM_VS_MENU_TOOLS" />
+    </CommandPlacement>
+
     <CommandPlacement guid="CmdSet" id="FileCommandGroup" priority="3">
-      <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_ITEMNODE" />
+      <Parent guid="CmdSet" id="MainMenu" />
+    </CommandPlacement>
+
+    <CommandPlacement guid="CmdSet" id="ProjectCommandGroup" priority="1">
+      <Parent guid="CmdSet" id="MainMenu" />
     </CommandPlacement>
 
     <CommandPlacement guid="CmdSet" id="CompileSassFileCommandId" priority="1">
       <Parent guid="CmdSet" id="FileCommandGroup" />
     </CommandPlacement>
+
+    <CommandPlacement guid="CmdSet" id="InstallNugetPackageCommandId" priority="1">
+      <Parent guid="CmdSet" id="ProjectCommandGroup" />
+    </CommandPlacement>
   </CommandPlacements>
+
+  <VisibilityConstraints>
+    <VisibilityItem guid="CmdSet" id="CompileSassFileCommandId" context="UICONTEXT_SolutionExists" />
+    <VisibilityItem guid="CmdSet" id="InstallNugetPackageCommandId" context="UICONTEXT_SolutionExists" />
+  </VisibilityConstraints>
 
   <Symbols>
     <GuidSymbol name="Package" value="{235471ab-a770-4d0e-b00b-4f80bb01f200}" />
 
     <GuidSymbol name="CmdSet" value="{f5f3a3ba-35a2-4f98-a0f3-bd33eefeb63d}">
-      <IDSymbol name="ToolsMenuGroup" value="0x101" />
-      <IDSymbol name="ExtensionsMenuGroup" value="0x102" />
+      <IDSymbol name="VSMainMenuGroup" value="0x101" />
+      <IDSymbol name="MiscellaneousGroup" value="0x102" />
 
       <IDSymbol name="FileCommandGroup" value="0x103" />
+      <IDSymbol name="ProjectCommandGroup" value="0x104" />
 
-      <IDSymbol name="GotoSettingsommandId" value="0x0500" />
+      <IDSymbol name="MainMenu" value="0x0201" />
+
+      <IDSymbol name="GotoSettingsCommandId" value="0x0500" />
       <IDSymbol name="CompileSassFileCommandId" value="0x0501" />
+      <IDSymbol name="InstallNugetPackageCommandId" value="0x0502" />
     </GuidSymbol>
   </Symbols>
 </CommandTable>

@@ -28,13 +28,13 @@ namespace Acklann.Sassin
             };
         }
 
-        private void OnSassFileChanged(IVsHierarchy hierarchy, bool partial, params string[] documents)
+        internal void Compile(string documentPath, IVsHierarchy hierarchy)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
             hierarchy.GetProperty(VSConstants.VSITEMID_ROOT, (int)__VSHPROPID.VSHPROPID_ExtObject, out object objProj);
             string projectPath = (objProj as EnvDTE.Project)?.FullName;
-            if (!File.Exists(projectPath)) return;
+            if (!File.Exists(projectPath) || !File.Exists(documentPath)) return;
 
             Microsoft.Build.Evaluation.Project config;
 
@@ -43,7 +43,11 @@ namespace Acklann.Sassin
             else
                 _msbulidProjects.Add(projectPath, config = new Microsoft.Build.Evaluation.Project(projectPath));
 
-            if (partial) documents = SassCompiler.FindFiles(Path.GetDirectoryName(projectPath)).ToArray();
+            string[] documents;
+            if (Path.GetFileName(documentPath).StartsWith("_"))
+                documents = SassCompiler.FindFiles(Path.GetDirectoryName(projectPath)).ToArray();
+            else
+                documents = new string[] { documentPath };
 
             var options = new CompilerOptions
             {
@@ -66,30 +70,38 @@ namespace Acklann.Sassin
                 foreach (CompilerError item in result.Errors)
                 {
                     if (item.Severity == ErrorSeverity.Debug)
-                        _vsOutWindow.OutputStringThreadSafe($"{Path.GetFileName(item.File)} {item.Line}:{item.Column} => {item.Message}{Environment.NewLine}");
+                        _vsOutWindow.OutputStringThreadSafe(string.Concat(item.Message, Environment.NewLine));
                     else
-                        AddErrorIfNotExist(item, hierarchy);
+                        HandleError(item, hierarchy);
                 }
             }
         }
 
-        private void AddErrorIfNotExist(CompilerError error, IVsHierarchy hierarchy)
+        private void HandleError(CompilerError error, IVsHierarchy hierarchy)
         {
             ErrorTask task;
-            bool notExist = true;
+            bool shouldAdd = true;
             int n = _errorList.Tasks.Count;
 
             for (int i = 0; i < n; i++)
             {
                 task = (ErrorTask)_errorList.Tasks[i];
+
+                if (task.Document == error.File)
+                {
+                    _errorList.Tasks.RemoveAt(i);
+                    n--;
+                }
+
                 if (task.Text == error.Message && task.Document == error.File && task.Line == error.Line && task.Column == error.Column)
                 {
-                    notExist = false;
+                    shouldAdd = false;
                 }
             }
 
-            if (notExist) _errorList.Tasks.Add(new ErrorTask
+            if (shouldAdd) _errorList.Tasks.Add(new ErrorTask
             {
+                CanDelete = false,
                 Text = error.Message,
                 HierarchyItem = hierarchy,
                 Document = error.File,
@@ -104,14 +116,12 @@ namespace Acklann.Sassin
 
         public int OnAfterSave(uint docCookie)
         {
-            //ThreadHelper.ThrowIfNotOnUIThread();
-
             RunningDocumentInfo document = _runningDocumentTable.GetDocumentInfo(docCookie);
             string fileName = Path.GetFileName(document.Moniker);
 
             if (fileName.EndsWith(".scss", StringComparison.OrdinalIgnoreCase))
             {
-                OnSassFileChanged(document.Hierarchy, fileName.StartsWith("_"), document.Moniker);
+                Compile(document.Moniker, document.Hierarchy);
             }
 
             return VSConstants.S_OK;

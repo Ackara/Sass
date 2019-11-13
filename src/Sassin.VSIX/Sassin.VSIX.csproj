@@ -71,11 +71,11 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="acklann.globn">
-      <Version>2.1.7</Version>
-    </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.SDK" Version="16.0.202" ExcludeAssets="runtime" />
     <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="16.3.2099" />
+    <PackageReference Include="NuGet.VisualStudio">
+      <Version>5.3.1</Version>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Sassin\Sassin.csproj">

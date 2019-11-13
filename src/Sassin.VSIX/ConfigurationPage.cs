@@ -41,6 +41,12 @@ namespace Acklann.Sassin
             set { ShouldAddSourceMapComment = value; }
         }
 
+        public override void SaveSettingsToStorage()
+        {
+            base.SaveSettingsToStorage();
+            System.Diagnostics.Debug.WriteLine("saved settings");
+        }
+
         #region Backing Members
 
         private const string General = "General";
