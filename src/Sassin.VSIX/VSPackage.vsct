@@ -11,6 +11,7 @@
       <Group guid="CmdSet" id="VSMainMenuGroup" />
       <Group guid="CmdSet" id="FileCommandGroup" />
       <Group guid="CmdSet" id="ProjectCommandGroup" />
+      <Group guid="CmdSet" id="MiscellaneousGroup" />
     </Groups>
 
     <Menus>
@@ -36,17 +37,25 @@
       <Button guid="CmdSet" id="InstallNugetPackageCommandId" priority="2" type="Button">
         <Icon guid="ImageCatalogGuid" id="NuGet" />
         <CommandFlag>IconIsMoniker</CommandFlag>
-        <CommandFlag>DefaultDisabled</CommandFlag>
+        <CommandFlag>DefaultInvisible</CommandFlag>
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <ButtonText>Setup Compile Sass On Build</ButtonText>
+        </Strings>
+      </Button>
+
+      <Button guid="CmdSet" id="GotoSettingsCommandId">
+        <Icon guid="ImageCatalogGuid" id="Settings" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText>Options...</ButtonText>
         </Strings>
       </Button>
     </Buttons>
   </Commands>
 
   <CommandPlacements>
-    <CommandPlacement guid="CmdSet" id="VSMainMenuGroup" priority="600">
+    <CommandPlacement guid="CmdSet" id="VSMainMenuGroup" priority="500">
       <Parent guid="guidSHLMainMenu" id="IDM_VS_MENU_TOOLS" />
     </CommandPlacement>
 
@@ -58,12 +67,20 @@
       <Parent guid="CmdSet" id="MainMenu" />
     </CommandPlacement>
 
+    <CommandPlacement guid="CmdSet" id="MiscellaneousGroup" priority="5">
+      <Parent guid="CmdSet" id="MainMenu" />
+    </CommandPlacement>
+
     <CommandPlacement guid="CmdSet" id="CompileSassFileCommandId" priority="1">
       <Parent guid="CmdSet" id="FileCommandGroup" />
     </CommandPlacement>
 
     <CommandPlacement guid="CmdSet" id="InstallNugetPackageCommandId" priority="1">
       <Parent guid="CmdSet" id="ProjectCommandGroup" />
+    </CommandPlacement>
+
+    <CommandPlacement guid="CmdSet" id="GotoSettingsCommandId" priority="10">
+      <Parent guid="CmdSet" id="MiscellaneousGroup" />
     </CommandPlacement>
   </CommandPlacements>
 

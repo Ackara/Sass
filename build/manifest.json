@@ -1,0 +1,25 @@
+﻿{
+    "Id":  null,
+    "Name":  null,
+    "Description":  null,
+    "Version":  {
+                    "Major":  0,
+                    "Minor":  0,
+                    "Patch":  1,
+                    "PreRelease":  null,
+                    "Build":  null,
+                    "IsPreRelease":  false,
+                    "IsStable":  false
+                },
+    "VersionFormat":  null,
+    "Company":  null,
+    "Authors":  null,
+    "Copyright":  null,
+    "License":  null,
+    "Website":  null,
+    "Repository":  null,
+    "Icon":  null,
+    "ReleaseNotes":  null,
+    "Tags":  null,
+    "BranchVersionMap":  null
+}

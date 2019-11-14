@@ -32,18 +32,19 @@ Param(
 	[switch]$Minor,
 	[switch]$Force
 )
-# Ensure we have our Dependencies
+
+# Ensuring we have our Dependencies
 if(-not ((&node --version) -match 'v\d+.\d+')) { throw "'nodejs' is not accessible on this machine."; }
 if(-not ((&dotnet --version) -match '\d+.\d+')) { throw "'dotnet' is not accessible on this machine."; }
 if (-not ((&git --version) -match 'git version \d+\.\d+')) { throw "'git' is not accessible on this machine."; }
 
-# Initialize the required variables.
+# Initializing the required variables.
 $Configuration = "Debug";
 if ($Release) { $Configuration = "Release"; }
 
 $SecretsFilePath = (Join-Path $PSScriptRoot "secrets.json");
 
-# Get the current branch from source control.
+# Getting the current branch from source control.
 $branchName = ([Environment]::GetEnvironmentVariable("BUILD_SOURCEBRANCHNAME"));
 if ([string]::IsNullOrEmpty($branchName))
 {
@@ -51,7 +52,7 @@ if ([string]::IsNullOrEmpty($branchName))
 	if ($match.Success) { $branchName = $match.Groups["name"].Value; }
 }
 
-# Install then invoking the Psake tasks.
+# Installing then invoking the Psake tasks.
 $toolsFolder = Join-Path $PSScriptRoot "tools";
 $psakeModule = Join-Path $toolsFolder "psake/*/*.psd1";
 if (-not (Test-Path $psakeModule))

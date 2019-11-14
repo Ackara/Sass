@@ -1,0 +1,215 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Daterpillar.Powershell</name>
+    </assembly>
+    <members>
+        <member name="T:Acklann.Daterpillar.Cmdlets.ClearSchemaCmdlet">
+            <summary>
+            <para type="synopsis">Drops all objects (tables, views, procedures, triggers, etc.).</para>
+            <para type="description">This cmdlet drops all objects (tables, views, procedures, triggers, etc.).</para>
+            <para type="link">https://github.com/Ackara/Daterpillar</para>
+            <para type="link">https://flywaydb.org/documentation/commandline/clean</para>
+            </summary>
+            <example>
+            <code>Clear-DaterpillarSchema SQLite 'C:/app/db.sqlite'</code>
+            <para>This will remove all table from the schema.</para>
+            </example>
+            <seealso cref="T:Acklann.Daterpillar.Cmdlets.FlywayCmdletWrapper" />
+        </member>
+        <member name="M:Acklann.Daterpillar.Cmdlets.ClearSchemaCmdlet.ProcessRecord">
+            <summary>
+            Processes the record.
+            </summary>
+            <exception cref="T:System.Exception"></exception>
+        </member>
+        <member name="T:Acklann.Daterpillar.Cmdlets.ExportSchemaCmdlet">
+            <summary>
+            <para type="synopsis">Generates a '.schema.xml' file from a '.dll' file.</para>
+            <para type="description">This cmdlet create a '.schema.xml' file from a '.dll' file.</para>
+            <para type="link">https://github.com/Ackara/Daterpillar</para>
+            <list type="alertSet">
+            <item>
+            <term>ProjectDirectory</term>
+            <description>
+            The project directory is solely used to locate any scripts specified in the '.shema.xml' import tag.
+            </description>
+            </item>
+            </list>
+            </summary>
+            <seealso cref="T:System.Management.Automation.Cmdlet" />
+        </member>
+        <member name="P:Acklann.Daterpillar.Cmdlets.ExportSchemaCmdlet.AssemblyFile">
+            <summary>
+            <para type="description">The absolute-path of the target assembly.</para>
+            </summary>
+        </member>
+        <member name="M:Acklann.Daterpillar.Cmdlets.ExportSchemaCmdlet.ProcessRecord">
+            <summary>
+            Processes the record.
+            </summary>
+            <exception cref="T:System.IO.FileNotFoundException">Could not find assembly file.</exception>
+        </member>
+        <member name="P:Acklann.Daterpillar.Cmdlets.FlywayCmdletWrapper.ConnectionType">
+            <summary>
+            <para type="description">The SQL language of the script.</para>
+            </summary>
+        </member>
+        <member name="P:Acklann.Daterpillar.Cmdlets.FlywayCmdletWrapper.MigrationsDirectory">
+            <summary>
+            <para type="description">The absolute-path of the directory that host the migration scripts.</para>
+            </summary>
+        </member>
+        <member name="P:Acklann.Daterpillar.Cmdlets.FlywayCmdletWrapper.FlywayFilePath">
+            <summary>
+            <para type="description">The absolute-path of the flyway executable file.</para>
+            </summary>
+        </member>
+        <member name="P:Acklann.Daterpillar.Cmdlets.FlywayCmdletWrapper.Timeout">
+            <summary>
+            <para type="description">The operation timeout interval in seconds. Defaults to 5 minutes.</para>
+            </summary>
+        </member>
+        <member name="P:Acklann.Daterpillar.Cmdlets.FlywayCmdletWrapper.InpuObject">
+            <summary>
+            <para type="description">The absolute-path of the directory that host the migration scripts.</para>
+            </summary>
+        </member>
+        <member name="P:Acklann.Daterpillar.Cmdlets.FlywayCmdletWrapper.Host">
+            <summary>
+            <para type="description">The server address.</para>
+            </summary>
+        </member>
+        <member name="P:Acklann.Daterpillar.Cmdlets.FlywayCmdletWrapper.User">
+            <summary>
+            <para type="description">The authorized user.</para>
+            </summary>
+        </member>
+        <member name="P:Acklann.Daterpillar.Cmdlets.FlywayCmdletWrapper.Password">
+            <summary>
+            <para type="description">The database password.</para>
+            </summary>
+        </member>
+        <member name="P:Acklann.Daterpillar.Cmdlets.FlywayCmdletWrapper.Database">
+            <summary>
+            <para type="description">The database name.</para>
+            </summary>
+        </member>
+        <member name="P:Acklann.Daterpillar.Cmdlets.FlywayCmdletWrapper.ConnectionString">
+            <summary>
+            Gets or sets the connection string.
+            <para type="description">The database connection-string. Must be formatted as &lt;key&gt;=&lt;value&gt;</para>
+            </summary>
+        </member>
+        <member name="T:Acklann.Daterpillar.Cmdlets.NewScriptCmdlet">
+            <summary>
+            <para type="synopsis">Generates a new migration script from the two specified '.schema.xml' files.</para>
+            <para type="description">This cmdlet creates a new migration script from two '.schema.xml' files.</para>
+            <para type="link">https://github.com/Ackara/Daterpillar</para>
+            </summary>
+        </member>
+        <member name="P:Acklann.Daterpillar.Cmdlets.NewScriptCmdlet.OldSchemaFilePath">
+            <summary>
+            <para type="description">The absolute-path of old/production '.schema.xml' file.</para>
+            </summary>
+        </member>
+        <member name="P:Acklann.Daterpillar.Cmdlets.NewScriptCmdlet.NewSchemaFilePath">
+            <summary>
+            <para type="description">The absolute-path of new/current '.schema.xml' file.</para>
+            </summary>
+        </member>
+        <member name="P:Acklann.Daterpillar.Cmdlets.NewScriptCmdlet.Destination">
+            <summary>
+            <para type="description">The absolute-path of the new migration script.</para>
+            </summary>
+        </member>
+        <member name="P:Acklann.Daterpillar.Cmdlets.NewScriptCmdlet.Language">
+            <summary>
+            <para type="description">The dialect of the sql script.</para>
+            </summary>
+        </member>
+        <member name="P:Acklann.Daterpillar.Cmdlets.NewScriptCmdlet.OmitDropStatements">
+            <summary>
+            <para type="description">Exclude all drop statements, when present.</para>
+            </summary>
+        </member>
+        <member name="P:Acklann.Daterpillar.Cmdlets.NewScriptCmdlet.Descripiton">
+            <summary>
+            Gets or sets the descripiton.
+            </summary>
+            <value>
+            The descripiton.
+            </value>
+        </member>
+        <member name="M:Acklann.Daterpillar.Cmdlets.NewScriptCmdlet.ProcessRecord">
+            <summary>
+            Processes the record.
+            </summary>
+            <exception cref="T:System.ArgumentException">
+            </exception>
+        </member>
+        <member name="T:Acklann.Daterpillar.Cmdlets.RepairSchemaCmdlet">
+            <summary>
+            <para type="synopsis">Repairs the schema history table.</para>
+            <para type="description">This cmdlet Repairs the schema history table.</para>
+            <para type="link">https://github.com/Ackara/Daterpillar</para>
+            <para type="link">https://flywaydb.org/documentation/command/repair</para>
+            </summary>
+            <example>
+            <code>
+            Repair-DaterpillarSchema SQLite 'C:/app/db.sqlite'
+            </code>
+            <para>This will repair the schema history table.</para>
+            </example>
+            <seealso cref="T:Acklann.Daterpillar.Cmdlets.FlywayCmdletWrapper"/>
+        </member>
+        <member name="M:Acklann.Daterpillar.Cmdlets.RepairSchemaCmdlet.ProcessRecord">
+            <summary>Processes the record.</summary>
+            <exception cref="T:System.Exception"></exception>
+        </member>
+        <member name="T:Acklann.Daterpillar.Cmdlets.ShowHistoryCmdlet">
+            <summary>
+            <para type="synopsis">Prints the details and status information about all the migrations.</para>
+            <para type="description">This cmdlet prints the details and status information about all the migrations.</para>
+            <para type="link">https://github.com/Ackara/Daterpillar</para>
+            <para type="link">https://flywaydb.org/documentation/commandline/info</para>
+            </summary>
+            <seealso cref="T:Acklann.Daterpillar.Cmdlets.FlywayCmdletWrapper" />
+        </member>
+        <member name="P:Acklann.Daterpillar.Cmdlets.ShowHistoryCmdlet.PassThru">
+            <summary>
+            <para type="description"></para>
+            </summary>
+        </member>
+        <member name="M:Acklann.Daterpillar.Cmdlets.ShowHistoryCmdlet.ProcessRecord">
+            <summary>
+            Processes the record.
+            </summary>
+        </member>
+        <member name="T:Acklann.Daterpillar.Cmdlets.UpdateSchemaCmdlet">
+            <summary>
+            <para type="synopsis">Migrates a schema to the latest version.</para>
+            <para type="description">This cmdlet will execute all pending migration scripts in the specified directory.</para>
+            <para type="link">https://github.com/Ackara/Daterpillar</para>
+            <para type="link">https://flywaydb.org/documentation/commandline/migrate</para>
+            </summary>
+            <seealso cref="T:System.Management.Automation.Cmdlet" />
+        </member>
+        <member name="P:Acklann.Daterpillar.Cmdlets.UpdateSchemaCmdlet.OldSchema">
+            <summary>
+            <para type="description">The current/production '.schema.xml' file. Typically the 'snapshot.schema.xml' file.</para>
+            </summary>
+        </member>
+        <member name="P:Acklann.Daterpillar.Cmdlets.UpdateSchemaCmdlet.NewSchema">
+            <summary>
+            <para type="description">The new '.schema.xml' file. Typically the '[assembly].schema.xml' file.</para>
+            </summary>
+        </member>
+        <member name="M:Acklann.Daterpillar.Cmdlets.UpdateSchemaCmdlet.ProcessRecord">
+            <summary>
+            Processes the record.
+            </summary>
+            <exception cref="T:System.Exception"></exception>
+        </member>
+    </members>
+</doc>

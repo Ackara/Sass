@@ -23,7 +23,7 @@ namespace Acklann.Sassin
 
             _errorList = new ErrorListProvider(package)
             {
-                ProviderName = $"{Symbols.ProductName} Error Provider",
+                ProviderName = $"{Symbols.ProductName} Error List",
                 ProviderGuid = new Guid("6e63fa03-9f4e-47da-9cf9-5efd22799c28")
             };
         }
@@ -31,6 +31,7 @@ namespace Acklann.Sassin
         internal void Compile(string documentPath, IVsHierarchy hierarchy)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
+            if (hierarchy == null) throw new ArgumentNullException(nameof(hierarchy));
 
             hierarchy.GetProperty(VSConstants.VSITEMID_ROOT, (int)__VSHPROPID.VSHPROPID_ExtObject, out object objProj);
             string projectPath = (objProj as EnvDTE.Project)?.FullName;
@@ -63,10 +64,7 @@ namespace Acklann.Sassin
             int n = documents.Length;
             for (int i = 0; i < n; i++)
             {
-                _statusBar.Text = $"{Symbols.ProductName} compiling {Path.GetFileName(documents[i])} ...";
                 CompilerResult result = SassCompiler.Compile(documents[i], options);
-                _statusBar.Text = $"{Symbols.ProductName} compilation complete.";
-
                 foreach (CompilerError item in result.Errors)
                 {
                     if (item.Severity == ErrorSeverity.Debug)
@@ -101,7 +99,6 @@ namespace Acklann.Sassin
 
             if (shouldAdd) _errorList.Tasks.Add(new ErrorTask
             {
-                CanDelete = false,
                 Text = error.Message,
                 HierarchyItem = hierarchy,
                 Document = error.File,

@@ -35,6 +35,7 @@ namespace Acklann.Sassin
                 var commandService = (await GetServiceAsync(typeof(IMenuCommandService)) as OleMenuCommandService);
                 commandService.AddCommand(new OleMenuCommand(OnCompileSassFileCommandInvoked, null, OnCompileSassFileCommandStatusQueried, new CommandID(Symbols.CmdSet.Guid, Symbols.CmdSet.CompileSassFileCommandId)));
                 commandService.AddCommand(new OleMenuCommand(OnInstallNugetPackageCommandInvoked, new CommandID(Symbols.CmdSet.Guid, Symbols.CmdSet.InstallNugetPackageCommandId)));
+                commandService.AddCommand(new MenuCommand(OnGotoSettingCommandInvoked, new CommandID(Symbols.CmdSet.Guid, Symbols.CmdSet.GotoSettingsCommandId)));
 
                 await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
                 var outputWindow = (IVsOutputWindow)await GetServiceAsync(typeof(SVsOutputWindow));
@@ -53,6 +54,7 @@ namespace Acklann.Sassin
             }
 
             await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+            VS.StatusBar.Text = $"{nameof(Symbols.ProductName)} is ready.";
             System.Windows.Forms.MessageBox.Show($"{Symbols.ProductName} was not loaded; Node Package Manager (NPM) is not installed on this machine.");
         }
 
@@ -119,6 +121,11 @@ namespace Acklann.Sassin
                     catch { status.Text = $"{Symbols.ProductName} failed to install {nameof(Sassin)}."; }
                     finally { status.Animate(false, EnvDTE.vsStatusAnimation.vsStatusAnimationBuild); }
             }
+        }
+
+        private void OnGotoSettingCommandInvoked(object sender, EventArgs e)
+        {
+            ShowOptionPage(typeof(ConfigurationPage));
         }
 
         private void OnSolutionOpened(object sender, Microsoft.VisualStudio.Shell.Events.OpenSolutionEventArgs e)
