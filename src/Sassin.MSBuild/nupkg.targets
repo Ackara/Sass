@@ -2,11 +2,10 @@
 
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <TraneleonRootDirectory>$([System.IO.Path]::GetDirectoryName($([System.IO.Path]::GetDirectoryName($([System.IO.Path]::GetDirectoryName($(MSBuildThisFileDirectory)))))))</TraneleonRootDirectory>
     <CompileSassFilesOnBuild Condition="$(CompileSassFilesOnBuild)==''">true</CompileSassFilesOnBuild>
   </PropertyGroup>
 
-  <PropertyGroup Label="compiler-options">
+  <PropertyGroup Label="Compiler Options">
     <SassCompilerShouldMinifyFile Condition="$(SassCompilerShouldMinifyFile)==''">true</SassCompilerShouldMinifyFile>
     <SassCompilerShouldGenerateSourceMap Condition="$(SassCompilerShouldGenerateSourceMap)==''">true</SassCompilerShouldGenerateSourceMap>
     <SassCompilerShouldAddSourceComments Condition="$(SassCompilerShouldAddSourceComments)==''">true</SassCompilerShouldAddSourceComments>
@@ -32,5 +31,5 @@
                      SourceMapDirectory="$(SassCompilerSourceMapDirectory)" />
   </Target>
 
-  <UsingTask AssemblyFile="$(TraneleonRootDirectory)\tools\netstandard2.0\Acklann.Traneleon.dll" TaskName="CompileSassTask" />
+  <UsingTask AssemblyFile="..\tools\netstandard2.0\Sassin.MSBuild.dll" TaskName="CompileSassTask" />
 </Project>

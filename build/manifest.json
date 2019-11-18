@@ -1,25 +1,22 @@
 ﻿{
-    "Id":  null,
-    "Name":  null,
-    "Description":  null,
-    "Version":  {
-                    "Major":  0,
-                    "Minor":  0,
-                    "Patch":  1,
-                    "PreRelease":  null,
-                    "Build":  null,
-                    "IsPreRelease":  false,
-                    "IsStable":  false
-                },
-    "VersionFormat":  null,
-    "Company":  null,
-    "Authors":  null,
-    "Copyright":  null,
-    "License":  null,
-    "Website":  null,
-    "Repository":  null,
-    "Icon":  null,
-    "ReleaseNotes":  null,
-    "Tags":  null,
-    "BranchVersionMap":  null
+  "name": "Sassin",
+  "description": "A sass compiler.",
+  "version": {
+    "major": 0,
+    "minor": 0,
+    "patch": 3
+  },
+  "authors": "Ackara",
+  "company": "Ackara",
+  "copyright": "Copyright {year} {company}, All Rights Reserved.",
+  "license": "license.md",
+  "website": "https://github.com/{company}/{name}",
+  "repository": "https://github.com/{company}/{name}.git",
+  "releaseNotes": "https://github.com/{company}/{name}/blob/master/changelog.md",
+  "icon": "icon.png",
+  "tags": "sass compiler",
+  "branchVersionMap": {
+    "master": "x.y.z-rc",
+    "default": "x.y.z-\\beta"
+  }
 }

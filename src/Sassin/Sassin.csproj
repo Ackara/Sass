@@ -1,9 +1,22 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>Acklann.Sassin</RootNamespace>
-  </PropertyGroup>
+  
+<Title>Sassin</Title>
+<Description>A sass compiler.</Description>
+<Version>0.0.3-rc</Version>
+<AssemblyVersion>0.0.3</AssemblyVersion>
+<PackageIcon>icon.png</PackageIcon>
+<RepositoryUrl>https://github.com/Ackara/Sassin.git</RepositoryUrl>
+<PackageProjectUrl>https://github.com/Ackara/Sassin</PackageProjectUrl>
+<PackageReleaseNotes>https://github.com/Ackara/Sassin/blob/master/changelog.md</PackageReleaseNotes>
+<PackageTags>sass compiler</PackageTags>
+<Authors>Ackara</Authors>
+<Copyright>Copyright 2019 Ackara, All Rights Reserved.</Copyright>
+<PackageLicenseFile>license.md</PackageLicenseFile>
+</PropertyGroup>
 
   <ItemGroup>
     <None Remove="compiler.js" />
@@ -16,5 +29,7 @@
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
   </ItemGroup>
+
+
 
 </Project>

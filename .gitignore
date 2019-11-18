@@ -330,6 +330,7 @@ ASALocalRun/
 .mfractor/
 
 # Generated Files
+[Tt]ools/
 *.map.*
 *.min.*
 

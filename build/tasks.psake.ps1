@@ -1,9 +1,9 @@
 # SYNOPSIS: This is a psake task file.
 Join-Path $PSScriptRoot "toolkit.psm1" | Import-Module -Force;
-FormatTaskName "$(Write-Header -ReturnAsString)`r`n  {0}`r`n$(Write-Header -ReturnAsString)";
+FormatTaskName "$(Out-StringHeader)`r`n  {0}`r`n$(Out-StringHeader)";
 
 Properties {
-	$Dependencies = @("Ncrement", "Daterpillar");
+	$Dependencies = @("Ncrement");
 
 	# Files & Folders
 	$SolutionFolder = (Split-Path $PSScriptRoot -Parent);
@@ -15,6 +15,7 @@ Properties {
 
 	# Arguments
     $ShouldCommitChanges = $true;
+	$Interactive = $true;
 	$CurrentBranch = "";
 	$Configuration = "";
 	$Filter = $null;
@@ -26,12 +27,12 @@ Properties {
 
 Task "Default" -depends @("configure", "compile", "test", "pack");
 
-Task "Deploy" -alias "publish" -description "This task compiles, test then publish all packages to their respective destination." `
--depends @("clean", "version", "compile", "test", "pack", "push-nuget", "tag");
+Task "Publish" -depends @("clean", "version", "compile", "test", "pack", "push-nuget", "tag") `
+-description "This task compiles, test then publish all packages to their respective destination.";
 
 # ======================================================================
 
-Task "Configure-Environment" -alias "configure" -description "This task generates all files required for development." `
+Task "Configure Local Environment" -alias "configure" -description "This task generates all files required for development." `
 -depends @("restore") -action {
 	# Generating the build manifest file.
 	if (-not (Test-Path $ManifestFilePath)) { New-NcrementManifest | ConvertTo-Json | Out-File $ManifestFilePath -Encoding utf8; }
@@ -41,18 +42,36 @@ Task "Configure-Environment" -alias "configure" -description "This task generate
 	if (-not (Test-Path $SecretsFilePath))
 	{
 		$content = "{ 'nugetKey': null }";
-		$content | ConvertFrom-Json | ConvertTo-Json | Out-File $SecretsFilePath -Encoding utf8;
+		$content | Out-File $SecretsFilePath -Encoding utf8;
 	}
 	Write-Host "  * added '$(Split-Path $SecretsFilePath -Leaf)' to the solution.";
 }
 
-Task "Package-Solution" -alias "pack" -description "This task generates all deployment packages." `
+Task "Package Solution" -alias "pack" -description "This task generates all deployment packages." `
 -depends @("restore") -action {
 	if (Test-Path $ArtifactsFolder) { Remove-Item $ArtifactsFolder -Recurse -Force; }
 	New-Item $ArtifactsFolder -ItemType Directory | Out-Null;
 
-	$version = ConvertTo-NcrementVersionNumber $ManifestFilePath $CurrentBranch;
-	Join-Path $SolutionFolder "src/$(Split-Path $SolutionFolder -Leaf)" | Get-ChildItem -File -Filter "*.*proj" | Invoke-NugetPack $ArtifactsFolder $Configuration $version.FullVersion;
+	$version = $ManifestFilePath | Select-NcrementVersionNumber $CurrentBranch;
+
+	# Copy .vsix package to artifacts folder.
+	Join-Path $SolutionFolder "src\*.VSIX\bin\$Configuration" | Get-ChildItem -Recurse -Filter "*.vsix" `
+		| Copy-Item -Destination "$ArtifactsFolder\$SolutionName.vsix" -Force;
+
+	# Export MSBuild project FDD components.
+	$proj = Join-Path $SolutionFolder "src\*.MSBuild\*.*proj" | Get-Item;
+	Write-Header "dotnet: publish '$($proj.BaseName)'";
+	Exec { &dotnet publish $proj.FullName --configuration $Configuration; }
+
+	# Generate MSBuild nuget package.
+	Write-Header "dotnet: pack '$($proj.BaseName)-$version'";
+	Exec { &dotnet pack $proj.FullName --output $ArtifactsFolder --configuration $Configuration -p:PackageVersion=$version; }
+
+	[string]$nupkg = Join-Path $ArtifactsFolder "*.nupkg" | Resolve-Path;
+	[string]$temp = [IO.Path]::ChangeExtension($nupkg, ".zip");
+	Copy-Item $nupkg -Destination $temp -Force;
+	Expand-Archive $temp -DestinationPath "$ArtifactsFolder\msbuild";
+	Remove-item $temp -Force;
 }
 
 #region ----- COMPILATION ----------------------------------------------
@@ -60,54 +79,54 @@ Task "Package-Solution" -alias "pack" -description "This task generates all depl
 Task "Clean" -description "This task removes all generated files and folders from the solution." `
 -action {
 	Join-Path $SolutionFolder "*.sln" | Get-Item | Remove-GeneratedProjectItem -AdditionalItems @("artifacts");
-	Get-ChildItem $SolutionFolder -Recurse -File -Filter "*.*proj" | Remove-GeneratedProjectItem -AdditionalItems @("package-lock.json");
+	Get-ChildItem $SolutionFolder -Recurse -File -Filter "*.*proj" | Remove-GeneratedProjectItem;
 }
 
-Task "Import-BuildDependencies" -alias "restore" -description "This task imports all build dependencies." `
+Task "Import Build Dependencies" -alias "restore" -description "This task imports all build dependencies." `
 -action {
-	# Installing all required dependencies.
 	foreach ($moduleId in $Dependencies)
 	{
 		$modulePath = Join-Path $ToolsFolder "$moduleId/*/*.psd1";
 		if (-not (Test-Path $modulePath)) { Save-Module $moduleId -Path $ToolsFolder; }
 		Import-Module $modulePath -Force;
-		Write-Host "  * imported the '$moduleId.$(Split-Path (Get-Item $modulePath).DirectoryName -Leaf)' powershell module.";
+		Write-Host "  * imported the '$moduleId-$(Split-Path (Get-Item $modulePath).DirectoryName -Leaf)' powershell module.";
 	}
 }
 
-Task "Increment-VersionNumber" -alias "version" -description "This task increments all of the projects version number." `
+Task "Increment Version Number" -alias "version" -description "This task increments all of the projects version number." `
 -depends @("restore") -action {
-	$manifest = $ManifestFilePath | Step-NcrementVersionNumber -Major:$Major -Minor:$Minor -Patch;
-	#$manifest | ConvertTo-Json | Out-File $ManifestFilePath -Encoding utf8;
-	#Exec { &git add $ManifestFilePath | Out-Null; };
-	
-	#Join-Path $SolutionFolder "src/*/*.csproj" | Get-ChildItem | Update-NcrementProjectFile $manifest -Commit:$ShouldCommitChanges `
-	#	| Write-FormatedMessage "  * updated '{0}' version number to '$(ConvertTo-NcrementVersionNumber $manifest | Select-Object -ExpandProperty Version)'.";
+	$manifest = $ManifestFilePath | Step-NcrementVersionNumber -Major:$Major -Minor:$Minor -Patch | Edit-NcrementManifest $ManifestFilePath -Stage:$ShouldCommitChanges;
+	$newVersion = $ManifestFilePath | Select-NcrementVersionNumber $CurrentBranch;
+
+	Join-Path $SolutionFolder "src/*/*.*proj" | Get-ChildItem | Update-NcrementProjectFile $ManifestFilePath -Commit:$ShouldCommitChanges | Split-Path -Leaf `
+		| Out-StringFormat "  * incremented '{0}' version number to '$newVersion'." | Write-Host;
 }
 
-Task "Build-Solution" -alias "compile" -description "This task compiles projects in the solution." `
+Task "Build Solution" -alias "compile" -description "This task compiles projects in the solution." `
 -action { Get-Item "$SolutionFolder/*.sln" | Invoke-MSBuild $Configuration; }
 
-Task "Run-Tests" -alias "test" -description "This task invoke all tests within the 'tests' folder." `
+Task "Run Tests" -alias "test" -description "This task invoke all tests within the 'tests' folder." `
 -action { Join-Path $SolutionFolder "tests" | Get-ChildItem -Recurse -File -Filter "*MSTest.csproj" | Invoke-MSTest $Configuration; }
 
-Task "Run-Benchmarks" -alias "benchmark" -description "This task invoke all benchmark tests within the 'tests' folder." `
+Task "Run Benchmarks" -alias "benchmark" -description "This task invoke all benchmark tests within the 'tests' folder." `
 -action { $projectFile = Join-Path $SolutionFolder "tests/*.Benchmark/*.*proj" | Get-Item | Invoke-BenchmarkDotNet -Filter $Filter -DryRun:$DryRun; }
 
 #endregion
 
 #region ----- PUBLISHING -----------------------------------------------
 
-Task "Publish-NuGetPackages" -alias "push-nuget" -description "This task publish all nuget packages to nuget.org." `
+Task "Publish NuGet Packages" -alias "push-nuget" -description "This task publish all nuget packages to nuget.org." `
 -precondition { return ($Configuration -ieq "Release") -and (Test-Path $ArtifactsFolder -PathType Container) } `
 -action { Get-ChildItem $ArtifactsFolder -Recurse -Filter "*.nupkg" | Publish-PackageToNuget $SecretsFilePath "nugetKey"; }
 
-Task "Publish-Website" -alias "push-web" -description "This task publish the website to the appropreaite server." `
+Task "Publish VSIX Packages" -alias "push-vsix" -description "This task publish all vsix packages to the marketplace." `
 -precondition { return ($Configuration -ieq "Release") -and (Test-Path $ArtifactsFolder -PathType Container) } `
--action { Join-Path $ArtifactsFolder "*.com" | Resolve-Path | Publish-WebPackages $SecretsFilePath $Configuration $CurrentBranch $ToolsFolder -DryRun:$DryRun; }
+-action {
+	Get-ChildItem $ArtifactsFolder -Recurse -Filter "*.vsix";
+}
 
 Task "Add-GitReleaseTag" -alias "tag" -description "This task tags the last commit with the version number." `
 -precondition { return $CurrentBranch -eq "master"; } `
--depends @("restore") -action { $ManifestFilePath | ConvertTo-NcrementVersionNumber | Select -ExpandProperty Version | New-GitTag $CurrentBranch; }
+-depends @("restore") -action { $ManifestFilePath | Select-NcrementVersionNumber | New-Tag; }
 
 #endregion
