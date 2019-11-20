@@ -19,7 +19,11 @@ namespace <#= Host.ResolveAssemblyReference("$(RootNamespace)") #>
 {
 	public static class <#= Path.GetFileNameWithoutExtension(Host.TemplateFile) #>
 	{
-		public const string ProductName = "<#= Host.ResolveAssemblyReference("$(Product)") #>";
+		public const string ProductName = "<#= Host.ResolveAssemblyReference("$(Title)") #>";
+		
+		public const string Version = "<#= Host.ResolveAssemblyReference("$(AssemblyVersion)") #>";
+		
+		public const string Description = "<#= Host.ResolveAssemblyReference("$(Description)") #>";
 
 		<# GenerateMembers(); #>
 	}

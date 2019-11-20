@@ -98,8 +98,9 @@ Task "Increment Version Number" -alias "version" -description "This task increme
 	$manifest = $ManifestFilePath | Step-NcrementVersionNumber -Major:$Major -Minor:$Minor -Patch | Edit-NcrementManifest $ManifestFilePath -Stage:$ShouldCommitChanges;
 	$newVersion = $ManifestFilePath | Select-NcrementVersionNumber $CurrentBranch;
 
-	Join-Path $SolutionFolder "src/*/*.*proj" | Get-ChildItem | Update-NcrementProjectFile $ManifestFilePath -Commit:$ShouldCommitChanges | Split-Path -Leaf `
-		| Out-StringFormat "  * incremented '{0}' version number to '$newVersion'." | Write-Host;
+	Join-Path $SolutionFolder "src/*/*.*" | Get-ChildItem | Where { ($_.Extension -ieq ".csproj") -or ($_.Extension -ieq ".vsixmanifest") } `
+		| Update-NcrementProjectFile $ManifestFilePath -Commit:$ShouldCommitChanges | Split-Path -Leaf `
+			| Out-StringFormat "  * incremented '{0}' version number to '$newVersion'." | Write-Host;
 }
 
 Task "Build Solution" -alias "compile" -description "This task compiles projects in the solution." `

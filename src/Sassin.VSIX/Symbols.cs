@@ -4,7 +4,11 @@ namespace Acklann.Sassin
 {
 	public static class Symbols
 	{
-		public const string ProductName = "$(Product)";
+		public const string ProductName = "Sassin";
+		
+		public const string Version = "0.0.12";
+		
+		public const string Description = "A sass compiler.";
 
 		public struct Package
 		{

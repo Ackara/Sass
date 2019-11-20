@@ -15,9 +15,9 @@ namespace Acklann.Sassin
 {
     [Guid(Symbols.Package.GuidString)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
-    [InstalledProductRegistration("#110", "#112", "0.0.1", IconResourceID = 400)]
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [ProvideOptionPage(typeof(ConfigurationPage), Symbols.ProductName, "General", 0, 0, true)]
+    [InstalledProductRegistration("#110", "#112", Symbols.Version, IconResourceID = 500)]
     [ProvideAutoLoad(VSConstants.UICONTEXT.SolutionExistsAndFullyLoaded_string, PackageAutoLoadFlags.BackgroundLoad)]
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "pkgdef, VS and vsixmanifest are valid VS terms")]
     public sealed class VSPackage : AsyncPackage
@@ -56,6 +56,7 @@ namespace Acklann.Sassin
             await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
             VS.StatusBar.Text = $"{nameof(Symbols.ProductName)} is ready.";
             System.Windows.Forms.MessageBox.Show($"{Symbols.ProductName} was not loaded; Node Package Manager (NPM) is not installed on this machine.");
+            System.Diagnostics.Debug.WriteLine("Initialization finished.");
         }
 
         private bool TryInitializeSolution()
