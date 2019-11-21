@@ -1,5 +1,6 @@
 using Microsoft.Build.Framework;
 using System.IO;
+using System.Linq;
 
 namespace Acklann.Sassin.MSBuild
 {
@@ -11,7 +12,6 @@ namespace Acklann.Sassin.MSBuild
             Minify = GenerateSourceMaps = AddSourceComments = true;
         }
 
-        [Required]
         public string ProjectDirectory { get; set; }
 
         public bool Minify { get; set; }
@@ -24,9 +24,13 @@ namespace Acklann.Sassin.MSBuild
 
         public bool Execute()
         {
+            if (string.IsNullOrEmpty(ProjectDirectory)) ProjectDirectory = Path.GetDirectoryName(BuildEngine.ProjectFileOfTaskNode);
             if (!Directory.Exists(ProjectDirectory)) throw new DirectoryNotFoundException($"Could not find directory at '{ProjectDirectory}'.");
 
-            NodeJS.Install();
+            NodeJS.Install((message, _, __) =>
+            {
+                Message($"{nameof(CompileSassTask)}: {message}", MessageImportance.High);
+            });
 
             var options = new CompilerOptions
             {
@@ -38,32 +42,41 @@ namespace Acklann.Sassin.MSBuild
                 SourceMapDirectory = SourceMapDirectory
             };
 
+            int failures = 0;
             foreach (string sassFile in SassCompiler.FindFiles(ProjectDirectory))
             {
                 CompilerResult result = SassCompiler.Compile(sassFile, options);
 
-                if (result.Success) LogMessage(result);
-
-                foreach (CompilerError err in result.Errors) LogCompilerError(err);
+                if (result.Success) LogResult(result); else failures++;
+                foreach (CompilerError err in result.Errors) LogError(err);
             }
 
-            return true;
+            return failures == 0;
         }
 
-        private void LogMessage(CompilerResult result)
+        private void Message(string message, MessageImportance importance = MessageImportance.Normal)
         {
+            BuildEngine.LogMessageEvent(new BuildMessageEventArgs(message, null, nameof(CompileSassTask), importance));
         }
 
-        private void LogMessage(string format, MessageImportance level = MessageImportance.Normal)
+        private void LogResult(CompilerResult result)
         {
+            string rel(string x) => string.Format("{0}\\{1}", Path.GetDirectoryName(x).Replace(ProjectDirectory, string.Empty), Path.GetFileName(x));
+
             BuildEngine.LogMessageEvent(new BuildMessageEventArgs(
-                format,
-                string.Empty,
+                string.Format(
+                    "sass -> in:{0}  out:{1}  elapse:{2}",
+
+                    rel(result.SourceFile),
+                    (result.GeneratedFiles.Length > 1 ? string.Format("[{0}]", string.Join(", ", result.GeneratedFiles.Select(x => rel(x)))) : rel(result.OutputFile)),
+                    result.Elapse.ToString("hh\\:mm\\:ss\\.fff")),
+                null,
                 nameof(CompileSassTask),
-                level));
+                MessageImportance.Normal
+                ));
         }
 
-        private void LogCompilerError(CompilerError error)
+        private void LogError(CompilerError error)
         {
             switch (error.Severity)
             {

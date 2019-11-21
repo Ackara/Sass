@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+  </PropertyGroup>
+
+  <Target Name="foo">
+    <CompileSassTask GenerateSourceMaps="false" />
+  </Target>
+
+
+  <Import Project="..\..\artifacts\msbuild\build\Sassin.MSBuild.targets" />
+</Project>

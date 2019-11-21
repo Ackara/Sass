@@ -7,7 +7,7 @@ namespace Acklann.Sassin
     {
         public static bool IsSassFile(this string filename)
         {
-            return filename.EndsWith(".scss", System.StringComparison.OrdinalIgnoreCase);
+            return filename.EndsWith(".scss", StringComparison.OrdinalIgnoreCase);
         }
 
         public static bool TryGetSelectedFile(this EnvDTE80.DTE2 dte, out EnvDTE.ProjectItem file)

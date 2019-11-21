@@ -22,7 +22,7 @@
   </Target>
 
   <Target Name="CompileSassFiles">
-    <CompileSassTask ProjectDirectory="$(MSBuildProjectFullPath)"
+    <CompileSassTask ProjectDirectory="$(MSBuildProjectDirectory)"
                      Minify="$(SassCompilerShouldMinifyFile)"
                      Suffix="$(SassCompilerOutputFileSuffix)"
                      OutputDirectory="$(SassCompilerOutputDirectory)"
