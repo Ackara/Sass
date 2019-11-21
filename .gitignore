@@ -331,7 +331,7 @@ ASALocalRun/
 
 # Generated Files
 [Tt]ools/
-*.map.*
+*.map
 *.min.*
 
 # Sensitive Files

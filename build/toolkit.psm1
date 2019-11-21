@@ -7,21 +7,29 @@ function Invoke-MSBuild
 		[ValidateSet("Debug", "Release")]
 		[string]$Configuration,
 
+		[string]$ToolPath,
+
 		$PackageSources = @(),
 
 		[Parameter(Mandatory, ValueFromPipeline)]
 		[ValidateScript({Test-Path $_})]
-		[IO.FileInfo]$SolutionFile,
-
-		[Alias('f')]
-		[switch]$FullFramework
+		[IO.FileInfo]$SolutionFile
 	)
 
 	PROCESS
 	{
-		Write-Header "dotnet: build '$($SolutionFile.BaseName)'";
-		Invoke-Tool{ &dotnet restore $SolutionFile.FullName --verbosity minimal; }
-		Invoke-Tool { &dotnet build $SolutionFile.FullName --configuration $Configuration --verbosity minimal; }
+		if (($ToolPath -ne $nul) -and (Test-Path $ToolPath -PathType Leaf))
+		{
+			Write-Header "msbuild: '$($SolutionFile.BaseName)'";
+			Invoke-Tool { &$ToolPath $SolutionFile.FullName -target:restore; }
+			Invoke-Tool { &$ToolPath $SolutionFile.FullName -property:Configuration=$Configuration; }
+		}
+		else
+		{
+			Write-Header "dotnet: build '$($SolutionFile.BaseName)'";
+			Invoke-Tool{ &dotnet restore $SolutionFile.FullName --verbosity minimal; }
+			Invoke-Tool { &dotnet build $SolutionFile.FullName --configuration $Configuration --verbosity minimal; }
+		}
 	}
 }
 
@@ -80,26 +88,6 @@ function Invoke-BenchmarkDotNet
 	}
 }
 
-function Invoke-Tool
-{
-    param(
-        [Parameter(Mandatory)]
-        [scriptblock]$Action,
-
-        [string]$WorkingDirectory = $null
-    )
-
-    if ($WorkingDirectory) { Push-Location -Path $WorkingDirectory; }
-
-	try
-	{
-		$global:lastexitcode = 0;
-		& $Action;
-		if ($global:lastexitcode -ne 0) { throw "The command [ $Action ] throw an exception."; }
-	}
-	finally { if ($WorkingDirectory) { Pop-Location; } }
-}
-
 function Remove-GeneratedProjectItem
 {
 	[CmdletBinding(SupportsShouldProcess)]
@@ -140,16 +128,16 @@ function New-Tag
 	Write-Host "  * pushed changes to source control.";
 }
 
-function Publish-PackageToNuget
+function Publish-NugetPackage
 {
 	Param(
 		[Parameter(Mandatory)]
 		[ValidateScript({Test-Path $_})]
 		[string]$SecretsFilePath,
 
-		[Parameter(Mandatory)]
+		[Parameter()]
 		[ValidateNotNullOrEmpty()]
-		[string]$Key,
+		[string]$Key = "nugetKey",
 
 		[ValidateNotNullOrEmpty()]
 		[string]$Source = "https://api.nuget.org/v3/index.json",
@@ -167,7 +155,7 @@ function Publish-PackageToNuget
 	}
 }
 
-function Publish-PackageToPowershellGallery
+function Publish-PowershellModule
 {
 	Param(
 		[Parameter(Mandatory)]
@@ -195,9 +183,64 @@ function Publish-PackageToPowershellGallery
 	}
 }
 
+function Publish-VsixPackage
+{
+	Param(
+		[Parameter(Mandatory)]
+		[ValidateScript({Test-Path $_ -PathType Leaf})]
+		[string]$SecretsFilePath,
+
+		[Parameter()]
+		[ValidateNotNullOrEmpty()]
+		[string]$Key = "vsixGallerKey",
+
+		[Parameter(Mandatory, ValueFromPipeline)]
+		[IO.FileInfo]$Package
+	)
+
+	BEGIN
+	{
+		[string]$apikey = Get-Content $SecretsFilePath | ConvertFrom-Json | Select-Property $Key;
+		[string]$publisher = Join-Path ([IO.Path]::GetTempPath()) "publish-vsix.ps1";
+
+		if (-not (Test-Path $publisher -PathType Leaf))
+		{
+			Invoke-WebRequest "https://raw.github.com/madskristensen/ExtensionScripts/master/AppVeyor/vsix.ps1" -OutFile $publisher;
+			Write-Host "  * downloaded publisher script."
+		}
+		. $publisher;
+	}
+
+	PROCESS
+	{
+		Write-Header "vsixPublisher: '$($Package.Basename)'";
+		Vsix-PublishToGallery $Package.FullName;
+	}
+}
+
 #endregion
 
-#region ----- OUTPUT -----------------------------------------------
+#region ----- Helpers -----------------------------------------------
+
+function Invoke-Tool
+{
+    param(
+        [Parameter(Mandatory)]
+        [scriptblock]$Action,
+
+        [string]$WorkingDirectory = $null
+    )
+
+    if ($WorkingDirectory) { Push-Location -Path $WorkingDirectory; }
+
+	try
+	{
+		$global:lastexitcode = 0;
+		& $Action;
+		if ($global:lastexitcode -ne 0) { throw "The command [ $Action ] throw an exception."; }
+	}
+	finally { if ($WorkingDirectory) { Pop-Location; } }
+}
 
 function Out-StringFormat
 {

@@ -12,6 +12,7 @@ Properties {
 	$ManifestFilePath = (Join-Path $PSScriptRoot  "manifest.json");
 	$SecretsFilePath = "";
 	$ToolsFolder = "";
+	$MSBuildExe = "";
 
 	# Arguments
     $ShouldCommitChanges = $true;
@@ -27,7 +28,7 @@ Properties {
 
 Task "Default" -depends @("configure", "compile", "test", "pack");
 
-Task "Publish" -depends @("clean", "version", "compile", "test", "pack", "push-nuget", "tag") `
+Task "Publish" -depends @("clean", "version", "compile", "test", "pack", "push-nuget", "push-vsix", "tag") `
 -description "This task compiles, test then publish all packages to their respective destination.";
 
 # ======================================================================
@@ -41,7 +42,7 @@ Task "Configure Local Environment" -alias "configure" -description "This task ge
 	# Generating a secrets file template to store sensitive information.
 	if (-not (Test-Path $SecretsFilePath))
 	{
-		$content = "{ 'nugetKey': null }";
+		$content = "{ `"nugetKey`": null }";
 		$content | Out-File $SecretsFilePath -Encoding utf8;
 	}
 	Write-Host "  * added '$(Split-Path $SecretsFilePath -Leaf)' to the solution.";
@@ -104,10 +105,10 @@ Task "Increment Version Number" -alias "version" -description "This task increme
 }
 
 Task "Build Solution" -alias "compile" -description "This task compiles projects in the solution." `
--action { Get-Item "$SolutionFolder/*.sln" | Invoke-MSBuild $Configuration; }
+-action { Get-Item "$SolutionFolder/*.sln" | Invoke-MSBuild $Configuration $MSBuildExe ; }
 
 Task "Run Tests" -alias "test" -description "This task invoke all tests within the 'tests' folder." `
--action { Join-Path $SolutionFolder "tests" | Get-ChildItem -Recurse -File -Filter "*MSTest.csproj" | Invoke-MSTest $Configuration; }
+-action { Join-Path $SolutionFolder "tests" | Get-ChildItem -Recurse -File -Filter "*MSTest.*proj" | Invoke-MSTest $Configuration; }
 
 Task "Run Benchmarks" -alias "benchmark" -description "This task invoke all benchmark tests within the 'tests' folder." `
 -action { $projectFile = Join-Path $SolutionFolder "tests/*.Benchmark/*.*proj" | Get-Item | Invoke-BenchmarkDotNet -Filter $Filter -DryRun:$DryRun; }
@@ -118,13 +119,11 @@ Task "Run Benchmarks" -alias "benchmark" -description "This task invoke all benc
 
 Task "Publish NuGet Packages" -alias "push-nuget" -description "This task publish all nuget packages to nuget.org." `
 -precondition { return ($Configuration -ieq "Release") -and (Test-Path $ArtifactsFolder -PathType Container) } `
--action { Get-ChildItem $ArtifactsFolder -Recurse -Filter "*.nupkg" | Publish-PackageToNuget $SecretsFilePath "nugetKey"; }
+-action { Get-ChildItem $ArtifactsFolder -Recurse -Filter "*.nupkg" | Publish-NugetPackage $SecretsFilePath "nugetKey"; }
 
 Task "Publish VSIX Packages" -alias "push-vsix" -description "This task publish all vsix packages to the marketplace." `
 -precondition { return ($Configuration -ieq "Release") -and (Test-Path $ArtifactsFolder -PathType Container) } `
--action {
-	Get-ChildItem $ArtifactsFolder -Recurse -Filter "*.vsix";
-}
+-action { Get-ChildItem $ArtifactsFolder -Recurse -Filter "*.vsix" | Publish-VsixPackage $SecretsFilePath "vsixGalleryKey"; }
 
 Task "Add-GitReleaseTag" -alias "tag" -description "This task tags the last commit with the version number." `
 -precondition { return $CurrentBranch -eq "master"; } `

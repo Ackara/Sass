@@ -33,6 +33,9 @@
     <Compile Include="toolkit.psm1" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="..\secrets.json">
+      <Link>secrets.json</Link>
+    </Content>
     <Content Include="manifest.json" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

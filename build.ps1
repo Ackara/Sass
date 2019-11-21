@@ -49,6 +49,7 @@ if (($Tasks.Length -gt 0) -and ($Tasks[0] -like "publish")) { $Configuration = "
 if ($Release) { $Configuration = "Release"; }
 
 $SecretsFilePath = (Join-Path $PSScriptRoot "secrets.json");
+$msbuild = try { (&cmd /c where msbuild); } catch { return $null; }
 
 # Getting the current branch from source control.
 $branchName = ([Environment]::GetEnvironmentVariable("BUILD_SOURCEBRANCHNAME"));
@@ -79,6 +80,7 @@ else
 	Write-Host "";
 	Invoke-psake $taskFile -nologo -taskList $Tasks -properties @{
 		"Filter"=$Filter;
+		"MSBuildExe"=$msbuild;
 		"Major"=$Major.IsPresent;
 		"Minor"=$Minor.IsPresent;
 		"Force"=$Force.IsPresent;
