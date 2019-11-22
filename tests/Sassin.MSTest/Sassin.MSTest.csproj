@@ -22,7 +22,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Sassin.MSBuild\Sassin.MSBuild.csproj" />
     <ProjectReference Include="..\..\src\Sassin\Sassin.csproj" />
   </ItemGroup>
 

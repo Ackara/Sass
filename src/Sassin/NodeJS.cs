@@ -159,7 +159,7 @@ namespace Acklann.Sassin
 
         #region Backing Members
 
-        private const string messageFormat = "loading dependencies {0}/{1} {2:0%} ({3}) ...";
+        private const string messageFormat = "Loading dependencies [{0}/{1} {2:0%}]; {3} ...";
 
         #endregion Backing Members
     }

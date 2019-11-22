@@ -4,9 +4,9 @@ using System.Linq;
 
 namespace Acklann.Sassin.MSBuild
 {
-    public class CompileSassTask : ITask
+    public class CompileSassFiles : ITask
     {
-        public CompileSassTask()
+        public CompileSassFiles()
         {
             Suffix = string.Empty;
             Minify = GenerateSourceMaps = AddSourceComments = true;
@@ -29,7 +29,7 @@ namespace Acklann.Sassin.MSBuild
 
             NodeJS.Install((message, _, __) =>
             {
-                Message($"{nameof(CompileSassTask)}: {message}", MessageImportance.High);
+                Message($"{nameof(CompileSassFiles)}: {message}", MessageImportance.High);
             });
 
             var options = new CompilerOptions
@@ -56,7 +56,7 @@ namespace Acklann.Sassin.MSBuild
 
         private void Message(string message, MessageImportance importance = MessageImportance.Normal)
         {
-            BuildEngine.LogMessageEvent(new BuildMessageEventArgs(message, null, nameof(CompileSassTask), importance));
+            BuildEngine.LogMessageEvent(new BuildMessageEventArgs(message, null, nameof(CompileSassFiles), importance));
         }
 
         private void LogResult(CompilerResult result)
@@ -71,7 +71,7 @@ namespace Acklann.Sassin.MSBuild
                     (result.GeneratedFiles.Length > 1 ? string.Format("[{0}]", string.Join(", ", result.GeneratedFiles.Select(x => rel(x)))) : rel(result.OutputFile)),
                     result.Elapse.ToString("hh\\:mm\\:ss\\.fff")),
                 null,
-                nameof(CompileSassTask),
+                nameof(CompileSassFiles),
                 MessageImportance.Normal
                 ));
         }
@@ -90,7 +90,7 @@ namespace Acklann.Sassin.MSBuild
                         0, 0,
                         error.Message,
                         string.Empty,
-                        nameof(CompileSassTask)));
+                        nameof(CompileSassFiles)));
                     break;
 
                 case ErrorSeverity.Warning:
@@ -103,7 +103,7 @@ namespace Acklann.Sassin.MSBuild
                         0, 0,
                         error.Message,
                         string.Empty,
-                        nameof(CompileSassTask)));
+                        nameof(CompileSassFiles)));
                     break;
             }
         }

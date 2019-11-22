@@ -1,39 +1,58 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>Acklann.Sassin</RootNamespace>
-  
-<Title>Sassin</Title>
-<Description>A sass compiler.</Description>
-<Version>0.0.13-rc</Version>
-<AssemblyVersion>0.0.13</AssemblyVersion>
-<PackageIcon>icon.png</PackageIcon>
-<RepositoryUrl>https://github.com/Ackara/Sassin.git</RepositoryUrl>
-<PackageProjectUrl>https://github.com/Ackara/Sassin</PackageProjectUrl>
-<PackageReleaseNotes>https://github.com/Ackara/Sassin/blob/master/changelog.md</PackageReleaseNotes>
-<PackageTags>sass compiler</PackageTags>
-<Authors>Ackara</Authors>
-<Copyright>Copyright 2019 Ackara, All Rights Reserved.</Copyright>
-<PackageLicenseFile>license.md</PackageLicenseFile>
+  </PropertyGroup>
 
-<Company>Ackara</Company>
-</PropertyGroup>
+  <PropertyGroup Label="Package">
+    <Title>Sassin</Title>
+    <Version>0.0.13-rc</Version>
+    <AssemblyVersion>0.0.13</AssemblyVersion>
+    <Description>A sass compiler.</Description>
+
+    <Authors>Ackara</Authors>
+    <Company>Ackara</Company>
+    <PackageLicenseFile>license.md</PackageLicenseFile>
+    <Copyright>Copyright 2019 Ackara, All Rights Reserved.</Copyright>
+
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageProjectUrl>https://github.com/Ackara/Sassin</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Ackara/Sassin.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageReleaseNotes>https://github.com/Ackara/Sassin/blob/master/changelog.md</PackageReleaseNotes>
+    <PackageTags>sass compiler</PackageTags>
+
+    <DevelopmentDependency>true</DevelopmentDependency>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+  </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="compiler.js" />
+    <PackageReference Include="Microsoft.Build.Framework" Version="16.3.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="compiler.js" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
+  <ItemGroup Label="Package">
+    <Content  Include="..\..\license.md">
+      <PackagePath>$(PackageLicenseFile)</PackagePath>
+      <Visible>false</Visible>
+    </Content>
+
+    <Content Include="..\..\art\icon.png">
+      <PackagePath>$(PackageIcon)</PackagePath>
+      <Visible>false</Visible>
+    </Content>
+
+    <Content Include="nupkg.targets">
+      <PackagePath>build\$(AssemblyName).targets</PackagePath>
+    </Content>
+
+    <Content Include="$(OutputPath)publish\*.*">
+      <PackagePath>build\</PackagePath>
+    </Content>
   </ItemGroup>
-
-
-
-
-
 </Project>

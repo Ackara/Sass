@@ -5,9 +5,9 @@
   </PropertyGroup>
 
   <Target Name="foo">
-    <CompileSassTask GenerateSourceMaps="false" />
+    <CompileSassFiles GenerateSourceMaps="false" />
   </Target>
 
 
-  <Import Project="..\..\artifacts\msbuild\build\Sassin.MSBuild.targets" />
+  <Import Project="..\..\artifacts\msbuild\build\Sassin.targets" />
 </Project>

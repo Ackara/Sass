@@ -60,7 +60,7 @@ Task "Package Solution" -alias "pack" -description "This task generates all depl
 		| Copy-Item -Destination "$ArtifactsFolder\$SolutionName.vsix" -Force;
 
 	# Export MSBuild project FDD components.
-	$proj = Join-Path $SolutionFolder "src\*.MSBuild\*.*proj" | Get-Item;
+	$proj = Join-Path $SolutionFolder "src\Sassin\*.*proj" | Get-Item;
 	Write-Header "dotnet: publish '$($proj.BaseName)'";
 	Exec { &dotnet publish $proj.FullName --configuration $Configuration; }
 
@@ -72,7 +72,10 @@ Task "Package Solution" -alias "pack" -description "This task generates all depl
 	[string]$temp = [IO.Path]::ChangeExtension($nupkg, ".zip");
 	Copy-Item $nupkg -Destination $temp -Force;
 	Expand-Archive $temp -DestinationPath "$ArtifactsFolder\msbuild";
+
+	# Cleanup
 	Remove-item $temp -Force;
+	Join-Path $SolutionFolder "src\*\bin\$Configuration\*\publish\" | Resolve-Path | Remove-Item -Recurse -Force;
 }
 
 #region ----- COMPILATION ----------------------------------------------

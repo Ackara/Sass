@@ -23,7 +23,7 @@ namespace Acklann.Sassin.Tests
             var mockEngine = A.Fake<Microsoft.Build.Framework.IBuildEngine>();
             A.CallTo(() => mockEngine.ProjectFileOfTaskNode).Returns(Path.Combine(projectFolder, "sassin.proj"));
 
-            var sut = new CompileSassTask
+            var sut = new CompileSassFiles
             {
                 BuildEngine = mockEngine,
                 GenerateSourceMaps = true,

@@ -18,11 +18,11 @@
   <Target Name="CompileSassFilesBeforeBuild"
           BeforeTargets="PreBuildEvent"
           Condition="$(CompileSassFilesOnBuild)">
-    <CallTarget Targets="CompileSassFiles" UseResultsCache="true" />
+    <CallTarget Targets="CompileAllSassFiles" UseResultsCache="true" />
   </Target>
 
-  <Target Name="CompileSassFiles">
-    <CompileSassTask ProjectDirectory="$(MSBuildProjectDirectory)"
+  <Target Name="CompileAllSassFiles">
+    <CompileSassFiles ProjectDirectory="$(MSBuildProjectDirectory)"
                      Minify="$(SassCompilerShouldMinifyFile)"
                      Suffix="$(SassCompilerOutputFileSuffix)"
                      OutputDirectory="$(SassCompilerOutputDirectory)"
@@ -31,5 +31,5 @@
                      SourceMapDirectory="$(SassCompilerSourceMapDirectory)" />
   </Target>
 
-  <UsingTask AssemblyFile="..\tools\netstandard2.0\Sassin.MSBuild.dll" TaskName="CompileSassTask" />
+  <UsingTask AssemblyFile=".\Sassin.dll" TaskName="CompileSassFiles" />
 </Project>
