@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -7,8 +7,8 @@
 
   <PropertyGroup Label="Package">
     <Title>Sassin</Title>
-    <Version>0.0.13-rc</Version>
-    <AssemblyVersion>0.0.13</AssemblyVersion>
+    <Version>0.0.14-rc</Version>
+    <AssemblyVersion>0.0.14</AssemblyVersion>
     <Description>A sass compiler.</Description>
 
     <Authors>Ackara</Authors>
@@ -37,7 +37,7 @@
   </ItemGroup>
 
   <ItemGroup Label="Package">
-    <Content  Include="..\..\license.md">
+    <Content Include="..\..\license.md">
       <PackagePath>$(PackageLicenseFile)</PackagePath>
       <Visible>false</Visible>
     </Content>
