@@ -7,8 +7,8 @@
 
   <PropertyGroup Label="Package">
     <Title>Sassin</Title>
-    <Version>0.0.15-rc</Version>
-    <AssemblyVersion>0.0.15</AssemblyVersion>
+    <Version>0.0.16-rc</Version>
+    <AssemblyVersion>0.0.16</AssemblyVersion>
     <Description>A sass compiler.</Description>
 
     <Authors>Ackara</Authors>
