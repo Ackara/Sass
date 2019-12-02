@@ -44,7 +44,7 @@ namespace Acklann.Sassin.Tests
             var separator = string.Concat(Enumerable.Repeat('=', 50));
             foreach (var item in result.GeneratedFiles)
             {
-                builder.AppendLine($"== {Path.GetFileName(item)}")
+                builder.AppendLine($"== {Path.GetFileName(item)} ({label})")
                        .AppendLine(separator)
                        .AppendLine(File.ReadAllText(item))
                        .AppendLine()
@@ -96,7 +96,7 @@ namespace Acklann.Sassin.Tests
             var folder = Sample.DirectoryName;
 
             // Act
-            var result = SassCompiler.FindFiles(folder);
+            var result = SassCompiler.GetSassFiles(folder);
 
             // Assert
             result.ShouldNotBeEmpty();
@@ -118,7 +118,6 @@ namespace Acklann.Sassin.Tests
             yield return new object[]{"css-map", 2, new CompilerOptions
             {
                 Minify = false,
-                Suffix = string.Empty,
                 AddSourceComments = true,
                 GenerateSourceMaps = true
             }};

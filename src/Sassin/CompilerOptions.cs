@@ -4,18 +4,18 @@ namespace Acklann.Sassin
     {
         public CompilerOptions()
         {
-            Suffix = ".min";
             Minify = GenerateSourceMaps = AddSourceComments = true;
         }
 
-        public bool Minify { get; set; }
-        public string Suffix { get; set; }
-        public string OutputDirectory { get; set; }
-        public bool KeepIntermediateFiles { get; set; }
+        public const string DEFAULT_NAME = "sassconfig.json";
 
+        public string OutputDirectory { get; set; }
+        public string ConfigurationFile { get; set; }
         public string SourceMapDirectory { get; set; }
-        public bool GenerateSourceMaps { get; set; }
+
+        public bool Minify { get; set; }
         public bool AddSourceComments { get; set; }
+        public bool GenerateSourceMaps { get; set; }
 
         public string ToArgs()
         {
@@ -23,15 +23,13 @@ namespace Acklann.Sassin
             string escape(object obj) => string.Concat('"', obj, '"');
 
             return string.Concat(
-                escape(OutputDirectory), " ",
-                escape(SourceMapDirectory), " ",
+                /* 3 */escape(ConfigurationFile), ' ',
+                /* 4 */escape(OutputDirectory), ' ',
+                /* 5 */escape(SourceMapDirectory), ' ',
 
-                escape(Suffix), " ",
-                toJs(Minify), " ",
-
-                toJs(KeepIntermediateFiles), " ",
-                toJs(GenerateSourceMaps), " ",
-                toJs(AddSourceComments)
+                /* 6 */toJs(Minify), ' ',
+                /* 7 */toJs(GenerateSourceMaps), ' ',
+                /* 8 */toJs(AddSourceComments)
                 );
         }
     }

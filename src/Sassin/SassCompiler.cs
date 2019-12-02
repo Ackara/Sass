@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Acklann.Sassin
 {
@@ -35,7 +36,10 @@ namespace Acklann.Sassin
             }
         }
 
-        public static IEnumerable<string> FindFiles(string directoryPath)
+        public static Task<CompilerResult> CompileAsync(string sassFilePath, CompilerOptions options)
+            => Task.Run(() => Compile(sassFilePath, options));
+
+        public static IEnumerable<string> GetSassFiles(string directoryPath)
         {
             if (!Directory.Exists(directoryPath)) throw new DirectoryNotFoundException($"Could not find directory at '{directoryPath}'.");
 

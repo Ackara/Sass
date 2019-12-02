@@ -16,47 +16,49 @@ namespace Acklann.Sassin
     [Guid(Symbols.Package.GuidString)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
-    [ProvideOptionPage(typeof(ConfigurationPage), Symbols.ProductName, "General", 0, 0, true)]
     [InstalledProductRegistration("#110", "#112", Symbols.Version, IconResourceID = 500)]
+    [ProvideOptionPage(typeof(ConfigurationPage), Symbols.ProductName, ConfigurationPage.Catagory, 0, 0, true)]
     [ProvideAutoLoad(VSConstants.UICONTEXT.SolutionExistsAndFullyLoaded_string, PackageAutoLoadFlags.BackgroundLoad)]
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "pkgdef, VS and vsixmanifest are valid VS terms")]
     public sealed class VSPackage : AsyncPackage
     {
         protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
-            bool hasDependencies = NodeJS.CheckInstallation();
+            vs = (DTE2)await GetServiceAsync(typeof(EnvDTE.DTE));
 
-            if (hasDependencies)
-            {
-                NodeJS.Install((msg, _, __) => { System.Diagnostics.Debug.WriteLine(msg); });
-
-                VS = (DTE2)await GetServiceAsync(typeof(EnvDTE.DTE));
-
-                var commandService = (await GetServiceAsync(typeof(IMenuCommandService)) as OleMenuCommandService);
-                commandService.AddCommand(new OleMenuCommand(OnCompileSassFileCommandInvoked, null, OnCompileSassFileCommandStatusQueried, new CommandID(Symbols.CmdSet.Guid, Symbols.CmdSet.CompileSassFileCommandId)));
-                commandService.AddCommand(new OleMenuCommand(OnInstallNugetPackageCommandInvoked, new CommandID(Symbols.CmdSet.Guid, Symbols.CmdSet.InstallNugetPackageCommandId)));
-                commandService.AddCommand(new MenuCommand(OnGotoSettingCommandInvoked, new CommandID(Symbols.CmdSet.Guid, Symbols.CmdSet.GotoSettingsCommandId)));
-
-                await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
-                var outputWindow = (IVsOutputWindow)await GetServiceAsync(typeof(SVsOutputWindow));
-                if (outputWindow != null)
-                {
-                    var guid = new Guid("455e712c-1c5a-43b9-8c70-7f8e9e0ec4f6");
-                    outputWindow.CreatePane(ref guid, Symbols.ProductName, 1, 1);
-                    outputWindow.GetPane(ref guid, out IVsOutputWindowPane pane);
-
-                    _fileWatcher = new SassWatcher(this, pane, VS?.StatusBar);
-                }
-
-                TryInitializeSolution();
-                Microsoft.VisualStudio.Shell.Events.SolutionEvents.OnAfterOpenSolution += OnSolutionOpened;
-                return;
-            }
+            var commandService = (await GetServiceAsync(typeof(IMenuCommandService)) as OleMenuCommandService);
+            commandService.AddCommand(new OleMenuCommand(OnCompileSassFileCommandInvoked, null, OnCompileSassFileCommandStatusQueried, new CommandID(Symbols.CmdSet.Guid, Symbols.CmdSet.CompileSassFileCommandId)));
+            commandService.AddCommand(new OleMenuCommand(OnInstallNugetPackageCommandInvoked, new CommandID(Symbols.CmdSet.Guid, Symbols.CmdSet.InstallNugetPackageCommandId)));
+            commandService.AddCommand(new MenuCommand(OnGotoSettingCommandInvoked, new CommandID(Symbols.CmdSet.Guid, Symbols.CmdSet.GotoSettingsCommandId)));
 
             await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
-            VS.StatusBar.Text = $"{nameof(Symbols.ProductName)} is ready.";
-            System.Windows.Forms.MessageBox.Show($"{Symbols.ProductName} was not loaded; Node Package Manager (NPM) is not installed on this machine.");
-            System.Diagnostics.Debug.WriteLine("Initialization finished.");
+
+            GetDialogPage(typeof(ConfigurationPage));
+            var outputWindow = (IVsOutputWindow)await GetServiceAsync(typeof(SVsOutputWindow));
+            if (outputWindow != null)
+            {
+                var guid = new Guid("455e712c-1c5a-43b9-8c70-7f8e9e0ec4f6");
+                outputWindow.CreatePane(ref guid, Symbols.ProductName, 1, 1);
+                outputWindow.GetPane(ref guid, out IVsOutputWindowPane pane);
+
+                _fileWatcher = new SassWatcher(this, pane);
+
+                await NodeJS.InstallAsync((msg, counter, goal) =>
+                {
+                    progress?.Report(new ServiceProgressData(msg, null, counter, goal));
+                    pane.OutputStringThreadSafe(msg + "\n");
+                    System.Diagnostics.Debug.WriteLine(msg);
+                    if (counter >= goal)
+                    {
+                        notReady = false;
+                        _fileWatcher.Activate();
+                        pane.OutputStringThreadSafe("\n\n");
+                    }
+                });
+            }
+
+            TryInitializeSolution();
+            Microsoft.VisualStudio.Shell.Events.SolutionEvents.OnAfterOpenSolution += OnSolutionOpened;
         }
 
         private bool TryInitializeSolution()
@@ -78,9 +80,10 @@ namespace Acklann.Sassin
         private void OnCompileSassFileCommandInvoked(object sender, EventArgs e)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
+            if (notReady) return;
 
-            if (VS != null
-                && VS.TryGetSelectedFile(out EnvDTE.ProjectItem selectedFile)
+            if (vs != null
+                && vs.TryGetSelectedFile(out EnvDTE.ProjectItem selectedFile)
                 && selectedFile.FileNames[0].IsSassFile())
             {
                 _solution.GetProjectOfUniqueName(selectedFile.ContainingProject.FullName, out IVsHierarchy hierarchy);
@@ -91,12 +94,12 @@ namespace Acklann.Sassin
         private void OnCompileSassFileCommandStatusQueried(object sender, EventArgs e)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
-            if (sender is OleMenuCommand command)
+            if (sender is OleMenuCommand btn)
             {
-                command.Visible = (
-                    VS != null
-                    && VS.TryGetSelectedFile(out EnvDTE.ProjectItem selectedFile)
-                    && selectedFile.FileNames[0].IsSassFile());
+                bool fileSelected = vs.TryGetSelectedFile(out EnvDTE.ProjectItem selectedFile);
+
+                btn.Enabled = fileSelected && Helper.IsSassFile(selectedFile?.Name);
+                btn.Text = string.Format("Compile {0}", (selectedFile?.Name ?? "File"));
             }
         }
 
@@ -104,12 +107,12 @@ namespace Acklann.Sassin
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            if (VS != null && VS.TryGetSelectedProject(out EnvDTE.Project project))
+            if (vs != null && vs.TryGetSelectedProject(out EnvDTE.Project project))
             {
                 IComponentModel componentModel = (IComponentModel)GetGlobalService(typeof(SComponentModel));
                 IVsPackageInstallerServices nuget = componentModel.GetService<IVsPackageInstallerServices>();
                 IVsPackageInstaller installer = componentModel.GetService<IVsPackageInstaller>();
-                EnvDTE.StatusBar status = VS.StatusBar;
+                EnvDTE.StatusBar status = vs.StatusBar;
 
                 if (!nuget.IsPackageInstalled(project, nameof(Sassin)))
                     try
@@ -136,7 +139,8 @@ namespace Acklann.Sassin
 
         #region Backing Members
 
-        internal DTE2 VS;
+        internal DTE2 vs;
+        private bool notReady = true;
         private IVsSolution _solution;
         private SassWatcher _fileWatcher;
 

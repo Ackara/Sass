@@ -10,12 +10,10 @@ namespace Acklann.Sassin
 {
     public class SassWatcher : IVsRunningDocTableEvents3
     {
-        public SassWatcher(VSPackage package, IVsOutputWindowPane pane, EnvDTE.StatusBar statusBar)
+        public SassWatcher(VSPackage package, IVsOutputWindowPane pane)
         {
             if (package == null) throw new ArgumentNullException(nameof(package));
-
             _vsOutWindow = pane ?? throw new ArgumentNullException(nameof(pane));
-            _statusBar = statusBar ?? throw new ArgumentNullException(nameof(statusBar));
             _msbulidProjects = new Dictionary<string, Microsoft.Build.Evaluation.Project>();
 
             _runningDocumentTable = new RunningDocumentTable(package);
@@ -28,113 +26,126 @@ namespace Acklann.Sassin
             };
         }
 
-        internal void Compile(string documentPath, IVsHierarchy hierarchy)
+        public void Activate(bool status = true)
         {
-            ThreadHelper.ThrowIfNotOnUIThread();
-            if (hierarchy == null) throw new ArgumentNullException(nameof(hierarchy));
+            _enabled = status;
+        }
+
+        public async void Compile(string documentPath, IVsHierarchy hierarchy)
+        {
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+            if (hierarchy == null) return;
 
             hierarchy.GetProperty(VSConstants.VSITEMID_ROOT, (int)__VSHPROPID.VSHPROPID_ExtObject, out object objProj);
             string projectPath = (objProj as EnvDTE.Project)?.FullName;
             if (!File.Exists(projectPath) || !File.Exists(documentPath)) return;
 
-            Microsoft.Build.Evaluation.Project config;
-
-            if (_msbulidProjects.ContainsKey(projectPath))
-                config = _msbulidProjects[projectPath];
-            else
-                _msbulidProjects.Add(projectPath, config = new Microsoft.Build.Evaluation.Project(projectPath));
-
             string[] documents;
             if (Path.GetFileName(documentPath).StartsWith("_"))
-                documents = SassCompiler.FindFiles(Path.GetDirectoryName(projectPath)).ToArray();
+                documents = SassCompiler.GetSassFiles(Path.GetDirectoryName(projectPath)).ToArray();
             else
                 documents = new string[] { documentPath };
 
+            string configPath = Path.Combine(Path.GetDirectoryName(projectPath), ConfigurationPage.ConfigurationFileDefaultName);
             var options = new CompilerOptions
             {
-                SourceMapDirectory = config.GetProperty("SassCompilerSourceMapDirectory")?.EvaluatedValue,
-                OutputDirectory = config.GetProperty("SassCompilerOutputDirectory")?.EvaluatedValue,
-                Suffix = config.GetProperty("SassCompilerOutputFileSuffix")?.EvaluatedValue,
-
+                ConfigurationFile = (File.Exists(configPath) ? configPath : null),
                 AddSourceComments = ConfigurationPage.ShouldAddSourceMapComment,
                 GenerateSourceMaps = ConfigurationPage.ShouldGenerateSourceMap,
-                Minify = ConfigurationPage.ShouldMinifyFile,
+                Minify = ConfigurationPage.ShouldMinifyFile
             };
 
             int n = documents.Length;
             for (int i = 0; i < n; i++)
             {
-                CompilerResult result = SassCompiler.Compile(documents[i], options);
-                foreach (CompilerError item in result.Errors)
-                {
-                    if (item.Severity == ErrorSeverity.Debug)
-                        _vsOutWindow.OutputStringThreadSafe(string.Concat(item.Message, Environment.NewLine));
-                    else
-                        HandleError(item, hierarchy);
-                }
+                CompilerResult result = await SassCompiler.CompileAsync(documents[i], options);
+
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                ShowOutput(result, Path.GetDirectoryName(projectPath));
+                ShowErrors(documents[i], result.Errors, hierarchy);
             }
         }
 
-        private void HandleError(CompilerError error, IVsHierarchy hierarchy)
+        private void ShowErrors(string sourceFile, CompilerError[] result, IVsHierarchy hierarchy)
         {
-            ErrorTask task;
-            bool shouldAdd = true;
-            int n = _errorList.Tasks.Count;
+            string document;
+            int nErrors = _errorList.Tasks.Count;
 
-            for (int i = 0; i < n; i++)
+            // Removing the errors for the document and all parital files.
+            for (int i = 0; i < nErrors; i++)
             {
-                task = (ErrorTask)_errorList.Tasks[i];
-
-                if (task.Document == error.File)
+                document = _errorList.Tasks[i].Document;
+                if (Helper.SamePath(document, sourceFile) || Path.GetFileName(document).StartsWith("_"))
                 {
                     _errorList.Tasks.RemoveAt(i);
-                    n--;
-                }
-
-                if (task.Text == error.Message && task.Document == error.File && task.Line == error.Line && task.Column == error.Column)
-                {
-                    shouldAdd = false;
+                    nErrors--; i--;
                 }
             }
 
-            if (shouldAdd) _errorList.Tasks.Add(new ErrorTask
+            CompilerError error;
+            nErrors = result.Length;
+            for (int i = 0; i < nErrors; i++)
             {
-                Text = error.Message,
-                HierarchyItem = hierarchy,
-                Document = error.File,
-                Line = (error.Line - 1),
-                Column = error.Column,
-                Category = TaskCategory.BuildCompile,
-                ErrorCategory = ToCatetory(error.Severity)
-            });
+                error = result[i];
+                if (error.Severity == ErrorSeverity.Info)
+                    _vsOutWindow.OutputStringThreadSafe(error.Message + "\n");
+                else
+                    _errorList.Tasks.Add(new ErrorTask
+                    {
+                        Text = error.Message,
+                        HierarchyItem = hierarchy,
+                        Document = error.File,
+                        Line = (error.Line - 1),
+                        Column = error.Column,
+                        Category = TaskCategory.BuildCompile,
+                        ErrorCategory = ToCatetory(error.Severity)
+                    });
+            }
+        }
+
+        private void ShowOutput(CompilerResult result, string projectFolder)
+        {
+            string rel(string x) => (x == null ? "null" : string.Format("{0}\\{1}", Path.GetDirectoryName(x)?.Replace(projectFolder, string.Empty), Path.GetFileName(x)));
+
+            _vsOutWindow.OutputStringThreadSafe(
+                string.Format(
+                    "sass -> in:{0}  out:{1}  elapse:{2}\r\n",
+
+                    rel(result.SourceFile),
+                    (result.GeneratedFiles.Length > 1 ? string.Format("[{0}]", string.Join(", ", result.GeneratedFiles.Select(x => rel(x)))) : rel(result.OutputFile)),
+                    result.Elapse.ToString("hh\\:mm\\:ss\\.fff"))
+                );
         }
 
         #region IVsRunningDocTableEvents3
 
         public int OnAfterSave(uint docCookie)
         {
-            RunningDocumentInfo document = _runningDocumentTable.GetDocumentInfo(docCookie);
-            string fileName = Path.GetFileName(document.Moniker);
-
-            if (fileName.EndsWith(".scss", StringComparison.OrdinalIgnoreCase))
+            if (_enabled)
             {
-                Compile(document.Moniker, document.Hierarchy);
+                RunningDocumentInfo document = _runningDocumentTable.GetDocumentInfo(docCookie);
+                string fileName = Path.GetFileName(document.Moniker);
+
+                if (fileName.EndsWith(".scss", StringComparison.OrdinalIgnoreCase))
+                {
+                    Compile(document.Moniker, document.Hierarchy);
+                }
             }
 
             return VSConstants.S_OK;
         }
 
-        public int OnAfterFirstDocumentLock(uint docCookie, uint dwRDTLockType, uint dwReadLocksRemaining, uint dwEditLocksRemaining) => VSConstants.S_OK;
-
-        public int OnBeforeLastDocumentUnlock(uint docCookie, uint dwRDTLockType, uint dwReadLocksRemaining, uint dwEditLocksRemaining) => VSConstants.S_OK;
-
         public int OnAfterAttributeChange(uint docCookie, uint grfAttribs) => VSConstants.S_OK;
 
-        public int OnBeforeDocumentWindowShow(uint docCookie, int fFirstShow, IVsWindowFrame pFrame) => VSConstants.S_OK;
+        public int OnAfterAttributeChangeEx(uint docCookie, uint grfAttribs, IVsHierarchy pHierOld, uint itemidOld, string pszMkDocumentOld, IVsHierarchy pHierNew, uint itemidNew, string pszMkDocumentNew) => VSConstants.S_OK;
 
         public int OnAfterDocumentWindowHide(uint docCookie, IVsWindowFrame pFrame) => VSConstants.S_OK;
 
-        public int OnAfterAttributeChangeEx(uint docCookie, uint grfAttribs, IVsHierarchy pHierOld, uint itemidOld, string pszMkDocumentOld, IVsHierarchy pHierNew, uint itemidNew, string pszMkDocumentNew) => VSConstants.S_OK;
+        public int OnAfterFirstDocumentLock(uint docCookie, uint dwRDTLockType, uint dwReadLocksRemaining, uint dwEditLocksRemaining) => VSConstants.S_OK;
+
+        public int OnBeforeDocumentWindowShow(uint docCookie, int fFirstShow, IVsWindowFrame pFrame) => VSConstants.S_OK;
+
+        public int OnBeforeLastDocumentUnlock(uint docCookie, uint dwRDTLockType, uint dwReadLocksRemaining, uint dwEditLocksRemaining) => VSConstants.S_OK;
 
         public int OnBeforeSave(uint docCookie) => VSConstants.S_OK;
 
@@ -142,18 +153,19 @@ namespace Acklann.Sassin
 
         #region Backing Members
 
+        private readonly ErrorListProvider _errorList;
         private readonly IDictionary<string, Microsoft.Build.Evaluation.Project> _msbulidProjects;
         private readonly RunningDocumentTable _runningDocumentTable;
-        private readonly ErrorListProvider _errorList;
+
         private readonly IVsOutputWindowPane _vsOutWindow;
-        private readonly EnvDTE.StatusBar _statusBar;
+        private bool _enabled = false;
 
         private static TaskErrorCategory ToCatetory(ErrorSeverity severity)
         {
             switch (severity)
             {
                 default:
-                case ErrorSeverity.Debug:
+                case ErrorSeverity.Info:
                     return TaskErrorCategory.Message;
 
                 case ErrorSeverity.Warning:

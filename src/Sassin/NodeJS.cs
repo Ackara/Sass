@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace Acklann.Sassin
 {
@@ -12,12 +13,10 @@ namespace Acklann.Sassin
     {
         static NodeJS()
         {
-            InstallationDirectory = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            if (Directory.Exists(InstallationDirectory) == false) InstallationDirectory = Path.GetDirectoryName(typeof(NodeJS).Assembly.Location);
-#if DEBUG
-            InstallationDirectory = Path.GetDirectoryName(typeof(NodeJS).Assembly.Location);
-#endif
-            InstallationDirectory = Path.Combine(InstallationDirectory, "tools");
+            Assembly assembly = typeof(NodeJS).Assembly;
+
+            InstallationDirectory = Path.Combine(Path.GetDirectoryName(assembly.Location));
+            InstallationDirectory = Path.Combine(InstallationDirectory, "tools", assembly.GetName().Version.ToString());
         }
 
         public static readonly string InstallationDirectory;
@@ -37,16 +36,14 @@ namespace Acklann.Sassin
                 npm.WaitForExit();
                 return npm.ExitCode == 0;
             }
-#if DEBUG
             catch (Exception ex)
             {
+#if DEBUG
                 System.Diagnostics.Debug.WriteLine(ex.Message);
                 Console.WriteLine(ex.Message);
+#endif
                 return false;
             }
-#else
-            catch { return false; }
-#endif
             finally { npm.Dispose(); }
         }
 
@@ -62,17 +59,18 @@ namespace Acklann.Sassin
 
         public static void Install(ProgressHandler handler = default, bool overwrite = false)
         {
-            int progress = 1, goal = (_dependencies.Length + 1);
+            int progress = 1, goal = (_dependencies.Length + 2);
 
             string modulesFolder = Path.Combine(InstallationDirectory, "node_modules");
             if (!Directory.Exists(modulesFolder))
-                InstallModules(handler, ref progress, goal);
+                InstallModules(modulesFolder, handler, ref progress, goal);
 
             if (!Directory.EnumerateFiles(InstallationDirectory, "*.js").Any())
                 ExtractBinaries(handler, ref progress, goal, overwrite);
-
-            handler?.Invoke("installtion complete", progress, goal);
         }
+
+        public static Task InstallAsync(ProgressHandler handler = default, bool overwrite = false)
+            => Task.Run(() => { Install(handler, overwrite); });
 
         public static bool TryInstall(ProgressHandler handler = default, bool overwrite = false)
         {
@@ -101,15 +99,15 @@ namespace Acklann.Sassin
             return new Process() { StartInfo = info };
         }
 
-        private static void InstallModules(ProgressHandler handler, ref int progress, int goal)
+        private static void InstallModules(string node_modules, ProgressHandler handler, ref int progress, int goal)
         {
             Process npm = null;
 
             try
             {
                 npm = GetStartInfo();
-                npm.StartInfo.WorkingDirectory = InstallationDirectory;
-                if (!Directory.Exists(InstallationDirectory)) Directory.CreateDirectory(InstallationDirectory);
+                npm.StartInfo.WorkingDirectory = node_modules;
+                if (!Directory.Exists(node_modules)) Directory.CreateDirectory(node_modules);
 
                 foreach (string item in _dependencies)
                 {

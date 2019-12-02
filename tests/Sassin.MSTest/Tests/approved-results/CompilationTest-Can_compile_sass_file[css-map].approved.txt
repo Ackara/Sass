@@ -1,4 +1,4 @@
-== basic.css.map
+== basic.css.map (css-map)
 ==================================================
 {
 	"version": 3,
@@ -11,7 +11,7 @@
 }
 
 
-== basic.css
+== basic.css (css-map)
 ==================================================
 /* this should be removed */
 /* line 4, samples/basic.scss */

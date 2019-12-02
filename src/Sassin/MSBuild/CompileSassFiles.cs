@@ -8,17 +8,16 @@ namespace Acklann.Sassin.MSBuild
     {
         public CompileSassFiles()
         {
-            Suffix = string.Empty;
             Minify = GenerateSourceMaps = AddSourceComments = true;
         }
 
-        public string ProjectDirectory { get; set; }
+        public string ProjectDirectory;
+
+        public string OptionsFile { get; set; }
+        public string OutputDirectory { get; set; }
+        public string SourceMapDirectory { get; set; }
 
         public bool Minify { get; set; }
-        public string Suffix { get; set; }
-        public string OutputDirectory { get; set; }
-
-        public string SourceMapDirectory { get; set; }
         public bool GenerateSourceMaps { get; set; }
         public bool AddSourceComments { get; set; }
 
@@ -35,20 +34,20 @@ namespace Acklann.Sassin.MSBuild
             var options = new CompilerOptions
             {
                 Minify = Minify,
-                Suffix = Suffix,
                 OutputDirectory = OutputDirectory,
                 AddSourceComments = AddSourceComments,
                 GenerateSourceMaps = GenerateSourceMaps,
-                SourceMapDirectory = SourceMapDirectory
+                SourceMapDirectory = SourceMapDirectory,
+                ConfigurationFile = (File.Exists(OptionsFile) ? OptionsFile : null)
             };
 
             int failures = 0;
-            foreach (string sassFile in SassCompiler.FindFiles(ProjectDirectory))
+            foreach (string sassFile in SassCompiler.GetSassFiles(ProjectDirectory))
             {
                 CompilerResult result = SassCompiler.Compile(sassFile, options);
 
-                if (result.Success) LogResult(result); else failures++;
                 foreach (CompilerError err in result.Errors) LogError(err);
+                if (result.Success) LogResult(result); else failures++;
             }
 
             return failures == 0;
@@ -61,7 +60,7 @@ namespace Acklann.Sassin.MSBuild
 
         private void LogResult(CompilerResult result)
         {
-            string rel(string x) => string.Format("{0}\\{1}", Path.GetDirectoryName(x).Replace(ProjectDirectory, string.Empty), Path.GetFileName(x));
+            string rel(string x) => (x == null ? "null" : string.Format("{0}\\{1}", Path.GetDirectoryName(x).Replace(ProjectDirectory, string.Empty), Path.GetFileName(x)));
 
             BuildEngine.LogMessageEvent(new BuildMessageEventArgs(
                 string.Format(

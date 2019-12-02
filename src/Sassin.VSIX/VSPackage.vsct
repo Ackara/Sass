@@ -8,9 +8,11 @@
 
   <Commands package="Package">
     <Groups>
-      <Group guid="CmdSet" id="VSMainMenuGroup" />
-      <Group guid="CmdSet" id="FileCommandGroup" />
-      <Group guid="CmdSet" id="ProjectCommandGroup" />
+      <Group guid="CmdSet" id="VSMainMenuGroup">
+        <Parent guid="guidSHLMainMenu" id="IDM_VS_MENU_TOOLS" />
+      </Group>
+
+      <Group guid="CmdSet" id="MainCommandGroup" />
       <Group guid="CmdSet" id="MiscellaneousGroup" />
     </Groups>
 
@@ -24,8 +26,9 @@
     </Menus>
 
     <Buttons>
-      <Button guid="CmdSet" id="CompileSassFileCommandId" priority="1" type="Button">
+      <Button guid="CmdSet" id="CompileSassFileCommandId" type="Button">
         <Icon guid="ImageCatalogGuid" id="Compile" />
+        <CommandFlag>TextChanges</CommandFlag>
         <CommandFlag>IconIsMoniker</CommandFlag>
         <CommandFlag>DefaultInvisible</CommandFlag>
         <CommandFlag>DynamicVisibility</CommandFlag>
@@ -34,7 +37,7 @@
         </Strings>
       </Button>
 
-      <Button guid="CmdSet" id="InstallNugetPackageCommandId" priority="2" type="Button">
+      <Button guid="CmdSet" id="InstallNugetPackageCommandId" type="Button">
         <Icon guid="ImageCatalogGuid" id="NuGet" />
         <CommandFlag>IconIsMoniker</CommandFlag>
         <CommandFlag>DefaultInvisible</CommandFlag>
@@ -59,11 +62,7 @@
       <Parent guid="guidSHLMainMenu" id="IDM_VS_MENU_TOOLS" />
     </CommandPlacement>
 
-    <CommandPlacement guid="CmdSet" id="FileCommandGroup" priority="3">
-      <Parent guid="CmdSet" id="MainMenu" />
-    </CommandPlacement>
-
-    <CommandPlacement guid="CmdSet" id="ProjectCommandGroup" priority="1">
+    <CommandPlacement guid="CmdSet" id="MainCommandGroup" priority="3">
       <Parent guid="CmdSet" id="MainMenu" />
     </CommandPlacement>
 
@@ -72,11 +71,11 @@
     </CommandPlacement>
 
     <CommandPlacement guid="CmdSet" id="CompileSassFileCommandId" priority="1">
-      <Parent guid="CmdSet" id="FileCommandGroup" />
+      <Parent guid="CmdSet" id="MainCommandGroup" />
     </CommandPlacement>
 
-    <CommandPlacement guid="CmdSet" id="InstallNugetPackageCommandId" priority="1">
-      <Parent guid="CmdSet" id="ProjectCommandGroup" />
+    <CommandPlacement guid="CmdSet" id="InstallNugetPackageCommandId" priority="2">
+      <Parent guid="CmdSet" id="MainCommandGroup" />
     </CommandPlacement>
 
     <CommandPlacement guid="CmdSet" id="GotoSettingsCommandId" priority="10">
@@ -96,8 +95,7 @@
       <IDSymbol name="VSMainMenuGroup" value="0x101" />
       <IDSymbol name="MiscellaneousGroup" value="0x102" />
 
-      <IDSymbol name="FileCommandGroup" value="0x103" />
-      <IDSymbol name="ProjectCommandGroup" value="0x104" />
+      <IDSymbol name="MainCommandGroup" value="0x103" />
 
       <IDSymbol name="MainMenu" value="0x0201" />
 

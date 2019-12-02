@@ -12,27 +12,20 @@ namespace Acklann.Sassin
             GenerateSourceMap = Minify = AddSourceMapComments = true;
         }
 
+        public const string Catagory = "General";
+        public static string ConfigurationFileDefaultName = CompilerOptions.DEFAULT_NAME;
         public static bool ShouldGenerateSourceMap, ShouldMinifyFile, ShouldAddSourceMapComment;
 
-        [Category(General)]
-        [DisplayName("Minify")]
-        [Description("Determines whether to optimize the .css file after compilation.")]
-        public bool Minify
+        [Category(Catagory)]
+        [DisplayName("Conguration File Default Name")]
+        [Description("The default name of the configuration file.")]
+        public string ConfigDefaultName
         {
-            get => ShouldMinifyFile;
-            set { ShouldMinifyFile = value; }
+            get => ConfigurationFileDefaultName;
+            set { ConfigurationFileDefaultName = value; }
         }
 
-        [Category(General)]
-        [DisplayName("Generate Source Map")]
-        [Description("Determines whether to create a source-map (.map) file for debugging.")]
-        public bool GenerateSourceMap
-        {
-            get => ShouldGenerateSourceMap;
-            set { ShouldGenerateSourceMap = value; }
-        }
-
-        [Category(General)]
+        [Category(Catagory)]
         [DisplayName("Add Source Map Comments")]
         [Description("Determines whether to add the line number and file where a selector is defined to be emitted into the compiled CSS as a comment. Useful for debugging, especially when using imports and mixins.")]
         public bool AddSourceMapComments
@@ -41,16 +34,22 @@ namespace Acklann.Sassin
             set { ShouldAddSourceMapComment = value; }
         }
 
-        public override void SaveSettingsToStorage()
+        [Category(Catagory)]
+        [DisplayName("Generate Source Map")]
+        [Description("Determines whether to create a source-map (.map) file for debugging.")]
+        public bool GenerateSourceMap
         {
-            base.SaveSettingsToStorage();
-            System.Diagnostics.Debug.WriteLine("saved settings");
+            get => ShouldGenerateSourceMap;
+            set { ShouldGenerateSourceMap = value; }
         }
 
-        #region Backing Members
-
-        private const string General = "General";
-
-        #endregion Backing Members
+        [Category(Catagory)]
+        [DisplayName("Minify")]
+        [Description("Determines whether to optimize the .css file after compilation.")]
+        public bool Minify
+        {
+            get => ShouldMinifyFile;
+            set { ShouldMinifyFile = value; }
+        }
     }
 }

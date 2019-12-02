@@ -34,6 +34,9 @@
 
   <ItemGroup>
     <EmbeddedResource Include="compiler.js" />
+    <EmbeddedResource Include="sassin-schema.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup Label="Package">
@@ -54,5 +57,9 @@
     <Content Include="$(OutputPath)publish\*.*">
       <PackagePath>build\</PackagePath>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="sassin-schema.json" />
   </ItemGroup>
 </Project>

@@ -1,4 +1,4 @@
-== basic.min.css.map
+== basic.css.map (css-min-map)
 ==================================================
 {
   "version": 3,
@@ -10,9 +10,9 @@
 }
 
 
-== basic.min.css
+== basic.css (css-min-map)
 ==================================================
 body,html{font-family:Consolas;height:100%;width:100%;color:#000}ul{list-style:none}li{margin:1px;padding:1em}.row{display:flex}.blue,.green,.red{color:#fff;cursor:pointer;transition-property:background-color;transition-duration:250ms}.red{background-color:#ff4d4d}.red:hover{background-color:red}.green{background-color:#00cd00}.green:hover{background-color:green}.blue{background-color:#4d4dff}.blue:hover{background-color:#00f}
-/*# sourceMappingURL=basic.min.css.map */
+/*# sourceMappingURL=basic.css.map */
 
 

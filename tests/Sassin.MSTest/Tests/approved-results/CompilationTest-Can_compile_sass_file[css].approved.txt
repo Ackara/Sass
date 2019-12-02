@@ -1,4 +1,4 @@
-== basic.css
+== basic.css (css)
 ==================================================
 /* this should be removed */
 html, body {

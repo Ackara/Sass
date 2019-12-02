@@ -2,7 +2,7 @@ namespace Acklann.Sassin
 {
     public enum ErrorSeverity
     {
-        Debug,
+        Info,
         Warning,
         Error
     }

@@ -12,43 +12,14 @@ const sourceMapMerger = require("multi-stage-sourcemap").transfer;
 
 function compile(args) {
     let generatedFiles = [];
+    let cssFile = args.getOutputPath();
+    let mapFile = args.getSourceMapPath();
 
-    let cssFile = args.getOutputPath(true);
-    let mapFile = args.getSourceMapPath(true);
-    let options = {
-        outFile: cssFile,
-        sourceMap: mapFile,
-        file: args.sourceFile,
-        sourceComments: args.addSourceComments,
-        omitSourceMapUrl: (args.generateSourceMaps == false),
-        outputStyle: "expanded",
+    args.sass.outFile = cssFile;
+    args.sass.sourceMap = mapFile;
+    args.sass.file = args.sourceFile;
 
-        functions: {
-            '@debug': function (msg) {
-                console.error(JSON.stringify({
-                    message: msg.getValue(),
-                    level: 0
-                }));
-                return sass.types.Null;
-            },
-            '@warn': function (msg) {
-                console.error(JSON.stringify({
-                    message: msg.getValue(),
-                    level: 1
-                }));
-                return sass.types.Null;
-            },
-            '@error': function (msg) {
-                console.error(JSON.stringify({
-                    message: msg.getValue(),
-                    level: 2
-                }));
-                return sass.types.Null;
-            }
-        }
-    };
-
-    sass.render(options, function (err, sassResult) {
+    sass.render(args.sass, function (err, sassResult) {
         if (err) {
             throw JSON.stringify({
                 file: err.file,
@@ -111,33 +82,78 @@ function createFile(absoluePath, content) {
     });
 }
 
+function mergeOptions(options) {
+    var config = { sass: null };
+    if (options.optionsFile) {
+        config = JSON.parse(fs.readFileSync(options.optionsFile, "uft8"));
+    }
+
+    var sassOptions = (config.sass ? config.sass : {});
+    if (!sassOptions.hasOwnProperty("outputStyle")) { sassOptions.outputStyle = "expanded"; }
+    if (!sassOptions.hasOwnProperty("sourceComments")) { sassOptions.sourceComments = options.addSourceComments; }
+    if (!sassOptions.hasOwnProperty("omitSourceMapUrl")) { sassOptions.omitSourceMapUrl = (options.generateSourceMaps == false); }
+
+    if (!sassOptions.functions) { sassOptions.functions = {}; }
+    if (!sassOptions.functions.hasOwnProperty("@debug")) {
+        sassOptions.functions["@debug"] = function (msg) {
+            console.error(JSON.stringify({
+                message: ("debug: " + msg.getValue()),
+                file: options.sourceFile,
+                level: 0
+            }));
+            return sass.types.Null;
+        }
+    }
+    if (!sassOptions.functions.hasOwnProperty("@warn")) {
+        sassOptions.functions["@warn"] = function (msg) {
+            console.error(JSON.stringify({
+                message: msg.getValue(),
+                file: options.sourceFile,
+                level: 1
+            }));
+            return sass.types.Null;
+        }
+    }
+    if (!sassOptions.functions.hasOwnProperty("@error")) {
+        sassOptions.functions["@error"] = function (msg) {
+            console.error(JSON.stringify({
+                message: msg.getValue(),
+                file: options.sourceFile,
+                level: 2
+            }));
+            return sass.types.Null;
+        }
+    }
+    options.sass = sassOptions;
+}
+
 function CompilerOptions() {
     let me = this;
     let bool = /true/i;
 
     me.sourceFile = process.argv[2];
+    me.optionsFile = process.argv[3];
 
-    me.outputDirectory = process.argv[3];
+    me.outputDirectory = process.argv[4];
     if (!me.outputDirectory) { me.outputDirectory = path.dirname(me.sourceFile); }
 
-    me.sourceMapDirectory = process.argv[4];
+    me.sourceMapDirectory = process.argv[5];
     if (!me.sourceMapDirectory) { me.sourceMapDirectory = me.outputDirectory; }
 
-    me.suffix = process.argv[5];
     me.minify = bool.test(process.argv[6]);
+    me.generateSourceMaps = bool.test(process.argv[7]);
+    me.addSourceComments = bool.test(process.argv[8]);
 
-    me.keepIntermediateFiles = bool.test(process.argv[7]);
-    me.generateSourceMaps = bool.test(process.argv[8]);
-    me.addSourceComments = bool.test(process.argv[9]);
+    mergeOptions(me);
 
-    me.getOutputPath = function (omitSuffix = false) {
+    me.getOutputPath = function () {
         let baseName = path.basename(me.sourceFile, path.extname(me.sourceFile));
-        return path.join(me.outputDirectory, (baseName + (omitSuffix ? "" : me.suffix) + ".css"));
+        return path.join(me.outputDirectory, (baseName + ".css"));
     }
 
-    me.getSourceMapPath = function (omitSuffix = false) {
+    me.getSourceMapPath = function () {
         let baseName = path.basename(me.sourceFile, path.extname(me.sourceFile));
-        return path.join(me.sourceMapDirectory, (baseName + (omitSuffix ? "" : me.suffix) + ".css.map"));
+        return path.join(me.sourceMapDirectory, (baseName + ".css.map"));
     }
 
     me.log = function () {
@@ -145,11 +161,10 @@ function CompilerOptions() {
         console.log("out: " + me.getOutputPath());
         console.log("dir: " + me.outputDirectory);
         console.log("smd: " + me.sourceMapDirectory);
-        console.log("suf: " + me.suffix);
 
         console.log("min: " + me.minify);
+        console.log("com: " + me.addSourceComments);
         console.log("map: " + me.generateSourceMaps);
-        console.log("imm: " + me.keepIntermediateFiles);
         console.log("====================");
         console.log("");
     }
