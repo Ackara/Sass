@@ -82,7 +82,7 @@ namespace Acklann.Sassin
 
                 json = JObject.Parse(line);
                 yield return new CompilerError(
-                    json["message"].Value<string>(),
+                    (json["message"]?.Value<string>() ?? default),
                     (json["file"]?.Value<string>() ?? default),
                     (json["line"]?.Value<int>() ?? default),
                     (json["column"]?.Value<int>() ?? default),
