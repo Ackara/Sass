@@ -130,6 +130,6 @@ Task "Publish VSIX Packages" -alias "push-vsix" -description "This task publish 
 
 Task "Add-GitReleaseTag" -alias "tag" -description "This task tags the last commit with the version number." `
 -precondition { return $CurrentBranch -eq "master"; } `
--depends @("restore") -action { $ManifestFilePath | Select-NcrementVersionNumber | New-Tag; }
+-depends @("restore") -action { $ManifestFilePath | Select-NcrementVersionNumber -Format "C" | New-Tag; }
 
 #endregion
