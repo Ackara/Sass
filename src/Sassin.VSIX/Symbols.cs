@@ -6,7 +6,7 @@ namespace Acklann.Sassin
 	{
 		public const string ProductName = "Sassin";
 		
-		public const string Version = "0.0.16";
+		public const string Version = "0.0.17";
 		
 		public const string Description = "A sass compiler.";
 
