@@ -1,0 +1,5 @@
+{
+  "minify": true,
+  "generateSourceMaps": true,
+  "addSourceComments": true
+}

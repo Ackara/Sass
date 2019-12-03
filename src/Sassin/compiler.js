@@ -65,10 +65,9 @@ function compile(args) {
 }
 
 function minify(cssFile, content, args) {
-    return csso.minify(content, {
-        filename: cssFile,
-        sourceMap: args.generateSourceMaps
-    });
+    args.csso.filename = cssFile;
+    args.csso.sourceMap = args.generateSourceMaps;
+    return csso.minify(content, args.csso);
 }
 
 function mergeSourceMaps(mapB, mapA) {
@@ -83,12 +82,19 @@ function createFile(absoluePath, content) {
 }
 
 function mergeOptions(options) {
-    var config = { sass: null };
+    var configFile = { sass: null, csso: null };
     if (options.optionsFile) {
-        config = JSON.parse(fs.readFileSync(options.optionsFile, "uft8"));
+        configFile = JSON.parse(fs.readFileSync(options.optionsFile).toString());
     }
 
-    var sassOptions = (config.sass ? config.sass : {});
+    if (configFile.outputDirectory) { options.outputDirectory = configFile.outputDirectory; }
+    if (configFile.sourceMapDirectory) { options.sourceMapDirectory = configFile.sourceMapDirectory; }
+    if (configFile.hasOwnProperty("generateSourceMaps")) { options.generateSourceMaps = configFile.generateSourceMaps; }
+    if (configFile.hasOwnProperty("minify")) { options.minify = configFile.minify; }
+
+    // Sass Compiler Options
+
+    var sassOptions = (configFile.sass ? configFile.sass : {});
     if (!sassOptions.hasOwnProperty("outputStyle")) { sassOptions.outputStyle = "expanded"; }
     if (!sassOptions.hasOwnProperty("sourceComments")) { sassOptions.sourceComments = options.addSourceComments; }
     if (!sassOptions.hasOwnProperty("omitSourceMapUrl")) { sassOptions.omitSourceMapUrl = (options.generateSourceMaps == false); }
@@ -125,6 +131,10 @@ function mergeOptions(options) {
         }
     }
     options.sass = sassOptions;
+
+    // CSSO Compiler Options
+
+    options.csso = (configFile.csso ? configFile.csso : {});
 }
 
 function CompilerOptions() {

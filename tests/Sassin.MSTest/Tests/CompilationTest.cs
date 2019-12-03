@@ -33,7 +33,6 @@ namespace Acklann.Sassin.Tests
             var cwd = Path.Combine(AppContext.BaseDirectory, "generated", label);
             if (Directory.Exists(cwd)) Directory.Delete(cwd, recursive: true);
             Directory.CreateDirectory(cwd);
-
             options.OutputDirectory = cwd;
 
             // Act
@@ -108,6 +107,9 @@ namespace Acklann.Sassin.Tests
 
         private static IEnumerable<object[]> GetCompilierOptions()
         {
+            string configFile = Path.Combine(Path.GetTempPath(), CompilerOptions.DEFAULT_NAME);
+            File.Copy(Sample.GetSassconfigJSON().FullName, configFile, overwrite: true);
+
             yield return new object[]{"css", 1, new CompilerOptions
             {
                 Minify = false,
@@ -127,6 +129,14 @@ namespace Acklann.Sassin.Tests
                 Minify = true,
                 AddSourceComments = false,
                 GenerateSourceMaps = true
+            }};
+
+            yield return new object[] { "css-conf", 2, new CompilerOptions
+            {
+                Minify = false,
+                AddSourceComments = false,
+                GenerateSourceMaps = false,
+                ConfigurationFile = configFile
             }};
         }
 

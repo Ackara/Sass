@@ -23,6 +23,7 @@ namespace Acklann.Sassin
 		public static FileInfo GetBasicSCSS() => GetFile(@"basic.scss");
 		public static FileInfo GetError7SCSS() => GetFile(@"error-7.scss");
 		public static FileInfo GetIndexHTML() => GetFile(@"index.html");
+		public static FileInfo GetSassconfigJSON() => GetFile(@"sassconfig.json");
 		public static FileInfo GetLayoutSCSS() => GetFile(@"base\_layout.scss");
 
 		public struct File
@@ -30,6 +31,7 @@ namespace Acklann.Sassin
 			public const string BasicSCSS = @"basic.scss";
 			public const string Error7SCSS = @"error-7.scss";
 			public const string IndexHTML = @"index.html";
+			public const string SassconfigJSON = @"sassconfig.json";
 			public const string LayoutSCSS = @"base\_layout.scss";
 		}
 	}	
