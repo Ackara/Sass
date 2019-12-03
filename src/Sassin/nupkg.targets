@@ -10,9 +10,9 @@
     <SassCompilerShouldGenerateSourceMap Condition="$(SassCompilerShouldGenerateSourceMap)==''">true</SassCompilerShouldGenerateSourceMap>
     <SassCompilerShouldAddSourceComments Condition="$(SassCompilerShouldAddSourceComments)==''">true</SassCompilerShouldAddSourceComments>
 
-    <SassCompilerOutputFileSuffix Condition="$(SassCompilerOutputFileSuffix)==''"></SassCompilerOutputFileSuffix>
     <SassCompilerOutputDirectory Condition="$(SassCompilerOutputDirectory)==''"></SassCompilerOutputDirectory>
     <SassCompilerSourceMapDirectory Condition="$(SassCompilerSourceMapDirectory)==''"></SassCompilerSourceMapDirectory>
+    <SassCompilerConfigurationFile Condition="$(SassCompilerConfigurationFile)==''">$(MSBuildProjectDirectory)\sassconfig.json</SassCompilerConfigurationFile>
   </PropertyGroup>
 
   <Target Name="CompileSassFilesBeforeBuild"
@@ -23,12 +23,13 @@
 
   <Target Name="CompileAllSassFiles">
     <CompileSassFiles ProjectDirectory="$(MSBuildProjectDirectory)"
-                     Minify="$(SassCompilerShouldMinifyFile)"
-                     Suffix="$(SassCompilerOutputFileSuffix)"
-                     OutputDirectory="$(SassCompilerOutputDirectory)"
-                     AddSourceComments="$(SassCompilerShouldAddSourceComments)"
-                     GenerateSourceMaps="$(SassCompilerShouldGenerateSourceMap)"
-                     SourceMapDirectory="$(SassCompilerSourceMapDirectory)" />
+                      OptionsFile="$(SassCompilerConfigurationFile)"
+                      OutputDirectory="$(SassCompilerOutputDirectory)"
+                      SourceMapDirectory="$(SassCompilerSourceMapDirectory)"
+
+                      Minify="$(SassCompilerShouldMinifyFile)"
+                      AddSourceComments="$(SassCompilerShouldAddSourceComments)"
+                      GenerateSourceMaps="$(SassCompilerShouldGenerateSourceMap)" />
   </Target>
 
   <UsingTask AssemblyFile=".\Sassin.dll" TaskName="CompileSassFiles" />

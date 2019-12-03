@@ -11,7 +11,7 @@ namespace Acklann.Sassin.MSBuild
             Minify = GenerateSourceMaps = AddSourceComments = true;
         }
 
-        public string ProjectDirectory;
+        public string ProjectDirectory { get; set; }
 
         public string OptionsFile { get; set; }
         public string OutputDirectory { get; set; }
@@ -67,7 +67,7 @@ namespace Acklann.Sassin.MSBuild
                     "sass -> in:{0}  out:{1}  elapse:{2}",
 
                     rel(result.SourceFile),
-                    (result.GeneratedFiles.Length > 1 ? string.Format("[{0}]", string.Join(", ", result.GeneratedFiles.Select(x => rel(x)))) : rel(result.OutputFile)),
+                    (result.GeneratedFiles.Length > 1 ? string.Format("[{0}]", string.Join(" ", result.GeneratedFiles.Select(x => rel(x)))) : rel(result.OutputFile)),
                     result.Elapse.ToString("hh\\:mm\\:ss\\.fff")),
                 null,
                 nameof(CompileSassFiles),
