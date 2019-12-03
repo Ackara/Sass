@@ -5,8 +5,8 @@
     <UseCodebase>true</UseCodebase>
     <Title>Sassin</Title>
     <Description>A sass compiler.</Description>
-    <Version>0.0.18-rc</Version>
-    <AssemblyVersion>0.0.18</AssemblyVersion>
+    <Version>0.0.19-rc</Version>
+    <AssemblyVersion>0.0.19</AssemblyVersion>
     <PackageIcon>icon.png</PackageIcon>
     <RepositoryUrl>https://github.com/Ackara/Sassin.git</RepositoryUrl>
     <PackageProjectUrl>https://github.com/Ackara/Sassin</PackageProjectUrl>

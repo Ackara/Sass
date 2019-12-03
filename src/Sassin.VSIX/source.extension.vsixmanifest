@@ -1,6 +1,6 @@
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="Sass.VSIX.88ed8a8b-e1f7-4496-9a4b-807fef4dba74" Version="0.0.18-rc" Language="en-US" Publisher="Ackara" />
+        <Identity Id="Sass.VSIX.88ed8a8b-e1f7-4496-9a4b-807fef4dba74" Version="0.0.19-rc" Language="en-US" Publisher="Ackara" />
         <DisplayName>Sassin</DisplayName>
         <Description xml:space="preserve">A sass compiler.</Description>
         <MoreInfo>https://github.com/Ackara/Sassin</MoreInfo>
