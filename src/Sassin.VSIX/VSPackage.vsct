@@ -8,10 +8,7 @@
 
   <Commands package="Package">
     <Groups>
-      <Group guid="CmdSet" id="VSMainMenuGroup">
-        <Parent guid="guidSHLMainMenu" id="IDM_VS_MENU_TOOLS" />
-      </Group>
-
+      <Group guid="CmdSet" id="VSMainMenuGroup" />
       <Group guid="CmdSet" id="MainCommandGroup" />
       <Group guid="CmdSet" id="MiscellaneousGroup" />
     </Groups>
