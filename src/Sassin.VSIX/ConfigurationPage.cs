@@ -9,12 +9,12 @@ namespace Acklann.Sassin
     {
         public ConfigurationPage()
         {
-            GenerateSourceMap = Minify = AddSourceMapComments = true;
+            GenerateSourceMap = Minify = AddSourceMapComments = ShouldShowErrors = true;
         }
 
         public const string Catagory = "General";
         public static string ConfigurationFileDefaultName = CompilerOptions.DEFAULT_NAME;
-        public static bool ShouldGenerateSourceMap, ShouldMinifyFile, ShouldAddSourceMapComment;
+        public static bool ShouldGenerateSourceMap, ShouldMinifyFile, ShouldAddSourceMapComment, ShouldShowErrors;
 
         [Category(Catagory)]
         [DisplayName("Conguration File Default Name")]
@@ -50,6 +50,15 @@ namespace Acklann.Sassin
         {
             get => ShouldMinifyFile;
             set { ShouldMinifyFile = value; }
+        }
+
+        [Category(Catagory)]
+        [DisplayName("Show Error")]
+        [Description("When enabled compilation errors will appear in the error list.")]
+        public bool ShowErrors
+        {
+            get => ShouldShowErrors;
+            set { ShouldShowErrors = true; }
         }
     }
 }

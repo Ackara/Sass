@@ -19,6 +19,13 @@ namespace Acklann.Sassin
                 );
         }
 
+        public static void Writeline(this Microsoft.VisualStudio.Shell.Interop.IVsOutputWindowPane pane, string message, params object[] args)
+        {
+#pragma warning disable VSTHRD010 // Invoke single-threaded types on Main thread
+            pane?.OutputStringThreadSafe(string.Format(string.Concat(message, '\n'), args));
+#pragma warning restore VSTHRD010 // Invoke single-threaded types on Main thread
+        }
+
         public static bool TryGetSelectedFile(this EnvDTE80.DTE2 dte, out EnvDTE.ProjectItem file)
         {
             Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();

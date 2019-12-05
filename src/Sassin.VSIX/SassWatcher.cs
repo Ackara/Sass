@@ -2,7 +2,6 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -14,7 +13,6 @@ namespace Acklann.Sassin
         {
             if (package == null) throw new ArgumentNullException(nameof(package));
             _vsOutWindow = pane ?? throw new ArgumentNullException(nameof(pane));
-            _msbulidProjects = new Dictionary<string, Microsoft.Build.Evaluation.Project>();
 
             _runningDocumentTable = new RunningDocumentTable(package);
             _runningDocumentTable.Advise(this);
@@ -88,18 +86,9 @@ namespace Acklann.Sassin
             {
                 error = result[i];
                 if (error.Severity == ErrorSeverity.Info)
-                    _vsOutWindow.OutputStringThreadSafe(error.Message + "\n");
+                    _vsOutWindow.Writeline(error.Message);
                 else
-                    _errorList.Tasks.Add(new ErrorTask
-                    {
-                        Text = error.Message,
-                        HierarchyItem = hierarchy,
-                        Document = error.File,
-                        Line = (error.Line - 1),
-                        Column = error.Column,
-                        Category = TaskCategory.BuildCompile,
-                        ErrorCategory = ToCatetory(error.Severity)
-                    });
+                    _errorList.Tasks.Add(ToError(error, hierarchy));
             }
         }
 
@@ -107,13 +96,12 @@ namespace Acklann.Sassin
         {
             string rel(string x) => (x == null ? "null" : string.Format("{0}\\{1}", Path.GetDirectoryName(x)?.Replace(projectFolder, string.Empty), Path.GetFileName(x)));
 
-            _vsOutWindow.OutputStringThreadSafe(
-                string.Format(
-                    "sass -> in:{0}  out:{1}  elapse:{2}\r\n",
+            _vsOutWindow.Writeline(
+                "sass -> in:{0}  out:{1}  elapse:{2}",
 
-                    rel(result.SourceFile),
-                    (result.GeneratedFiles.Length > 1 ? string.Format("[{0}]", string.Join(", ", result.GeneratedFiles.Select(x => rel(x)))) : rel(result.OutputFile)),
-                    result.Elapse.ToString("hh\\:mm\\:ss\\.fff"))
+                rel(result.SourceFile),
+                (result.GeneratedFiles.Length > 1 ? string.Format("[{0}]", string.Join(", ", result.GeneratedFiles.Select(x => rel(x)))) : rel(result.OutputFile)),
+                result.Elapse.ToString("hh\\:mm\\:ss\\.fff")
                 );
         }
 
@@ -153,11 +141,11 @@ namespace Acklann.Sassin
 
         #region Backing Members
 
-        private readonly ErrorListProvider _errorList;
-        private readonly IDictionary<string, Microsoft.Build.Evaluation.Project> _msbulidProjects;
+        private readonly Guid _textViewGuid = new Guid("{7651A703-06E5-11D1-8EBD-00A0C90F26EA}");
         private readonly RunningDocumentTable _runningDocumentTable;
-
         private readonly IVsOutputWindowPane _vsOutWindow;
+        private readonly ErrorListProvider _errorList;
+
         private bool _enabled = false;
 
         private static TaskErrorCategory ToCatetory(ErrorSeverity severity)
@@ -173,6 +161,32 @@ namespace Acklann.Sassin
 
                 case ErrorSeverity.Error:
                     return TaskErrorCategory.Error;
+            }
+        }
+
+        private ErrorTask ToError(CompilerError error, IVsHierarchy hierarchy)
+        {
+            var task = new ErrorTask
+            {
+                Text = error.Message,
+                HierarchyItem = hierarchy,
+                Document = error.File,
+                Line = (error.Line - 1),
+                Column = error.Column,
+                Category = TaskCategory.BuildCompile,
+                ErrorCategory = ToCatetory(error.Severity)
+            };
+            task.Navigate += GotoLine;
+            return task;
+        }
+
+        private void GotoLine(object sender, EventArgs e)
+        {
+            if (sender is ErrorTask task)
+            {
+                task.Line++;
+                _errorList.Navigate(task, _textViewGuid);
+                task.Line--;
             }
         }
 
