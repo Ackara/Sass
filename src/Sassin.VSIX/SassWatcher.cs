@@ -53,12 +53,11 @@ namespace Acklann.Sassin
                 Minify = ConfigurationPage.ShouldMinifyFile
             };
 
-            int n = documents.Length;
-            for (int i = 0; i < n; i++)
+            for (int i = 0; i < documents.Length; i++)
             {
                 CompilerResult result = await SassCompiler.CompileAsync(documents[i], options);
-
                 await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
                 ShowOutput(result, Path.GetDirectoryName(projectPath));
                 ShowErrors(documents[i], result.Errors, hierarchy);
             }

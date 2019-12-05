@@ -47,13 +47,14 @@ namespace Acklann.Sassin
             finally { npm.Dispose(); }
         }
 
-        public static Process Execute(string command, bool doNotWait = false)
+        public static Process Execute(string command)
         {
             if (string.IsNullOrEmpty(command)) throw new ArgumentNullException(nameof(command));
 
             Process cmd = GetStartInfo(command);
             cmd.Start();
-            if (doNotWait == false) cmd.WaitForExit();
+            cmd.WaitForExit();
+            System.Diagnostics.Debug.WriteLine($"exit: {cmd.ExitCode}");
             return cmd;
         }
 
@@ -96,6 +97,7 @@ namespace Acklann.Sassin
                 RedirectStandardOutput = true
             };
 
+            System.Diagnostics.Debug.WriteLine($"{info.FileName}> {command}");
             return new Process() { StartInfo = info };
         }
 
