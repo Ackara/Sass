@@ -2,11 +2,11 @@ using System;
 
 namespace Acklann.Sassin
 {
-	public static class Symbols
+	public static class Metadata
 	{
 		public const string ProductName = "Sassin";
 		
-		public const string Version = "0.0.19";
+		public const string Version = "0.0.20";
 		
 		public const string Description = "A sass compiler.";
 

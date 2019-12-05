@@ -19,14 +19,14 @@ namespace Acklann.Sassin
 
             _errorList = new ErrorListProvider(package)
             {
-                ProviderName = $"{Symbols.ProductName} Error List",
+                ProviderName = $"{Metadata.ProductName} Error List",
                 ProviderGuid = new Guid("6e63fa03-9f4e-47da-9cf9-5efd22799c28")
             };
         }
 
-        public void Activate(bool status = true)
+        public void Start()
         {
-            _enabled = status;
+            _stillLoading = false;
         }
 
         public async void Compile(string documentPath, IVsHierarchy hierarchy)
@@ -66,6 +66,8 @@ namespace Acklann.Sassin
 
         private void ShowErrors(string sourceFile, CompilerError[] result, IVsHierarchy hierarchy)
         {
+            if (ConfigurationPage.ShouldShowErrors == false) return;
+
             string document;
             int nErrors = _errorList.Tasks.Count;
 
@@ -100,7 +102,7 @@ namespace Acklann.Sassin
                 "sass -> in:{0}  out:{1}  elapse:{2}",
 
                 rel(result.SourceFile),
-                (result.GeneratedFiles.Length > 1 ? string.Format("[{0}]", string.Join(", ", result.GeneratedFiles.Select(x => rel(x)))) : rel(result.OutputFile)),
+                (result.GeneratedFiles.Length > 1 ? string.Format("[{0}]", string.Join(" + ", result.GeneratedFiles.Select(x => rel(x)))) : rel(result.OutputFile)),
                 result.Elapse.ToString("hh\\:mm\\:ss\\.fff")
                 );
         }
@@ -109,17 +111,15 @@ namespace Acklann.Sassin
 
         public int OnAfterSave(uint docCookie)
         {
-            if (_enabled)
+            if (_stillLoading) return VSConstants.S_OK;
+
+            RunningDocumentInfo document = _runningDocumentTable.GetDocumentInfo(docCookie);
+            string fileName = Path.GetFileName(document.Moniker);
+
+            if (fileName.EndsWith(".scss", StringComparison.OrdinalIgnoreCase))
             {
-                RunningDocumentInfo document = _runningDocumentTable.GetDocumentInfo(docCookie);
-                string fileName = Path.GetFileName(document.Moniker);
-
-                if (fileName.EndsWith(".scss", StringComparison.OrdinalIgnoreCase))
-                {
-                    Compile(document.Moniker, document.Hierarchy);
-                }
+                Compile(document.Moniker, document.Hierarchy);
             }
-
             return VSConstants.S_OK;
         }
 
@@ -145,8 +145,7 @@ namespace Acklann.Sassin
         private readonly RunningDocumentTable _runningDocumentTable;
         private readonly IVsOutputWindowPane _vsOutWindow;
         private readonly ErrorListProvider _errorList;
-
-        private bool _enabled = false;
+        private bool _stillLoading = true;
 
         private static TaskErrorCategory ToCatetory(ErrorSeverity severity)
         {

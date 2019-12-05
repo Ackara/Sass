@@ -27,7 +27,7 @@ namespace Acklann.Sassin
 
         [Category(Catagory)]
         [DisplayName("Add Source Map Comments")]
-        [Description("Determines whether to add the line number and file where a selector is defined to be emitted into the compiled CSS as a comment. Useful for debugging, especially when using imports and mixins.")]
+        [Description("When enabled add the line number and file where a selector is defined to be emitted into the compiled CSS as a comment. Useful for debugging, especially when using imports and mixins.")]
         public bool AddSourceMapComments
         {
             get => ShouldAddSourceMapComment;
@@ -36,7 +36,7 @@ namespace Acklann.Sassin
 
         [Category(Catagory)]
         [DisplayName("Generate Source Map")]
-        [Description("Determines whether to create a source-map (.map) file for debugging.")]
+        [Description("When enabled source-map files will be generated after compilation.")]
         public bool GenerateSourceMap
         {
             get => ShouldGenerateSourceMap;
@@ -45,7 +45,7 @@ namespace Acklann.Sassin
 
         [Category(Catagory)]
         [DisplayName("Minify")]
-        [Description("Determines whether to optimize the .css file after compilation.")]
+        [Description("When enabled sass files will be minified after compilation.")]
         public bool Minify
         {
             get => ShouldMinifyFile;
