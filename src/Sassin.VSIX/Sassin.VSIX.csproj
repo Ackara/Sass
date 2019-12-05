@@ -5,8 +5,8 @@
     <UseCodebase>true</UseCodebase>
     <Title>Sassin</Title>
     <Description>A sass compiler.</Description>
-    <Version>0.0.19-rc</Version>
-    <AssemblyVersion>0.0.19</AssemblyVersion>
+    <Version>0.0.20-rc</Version>
+    <AssemblyVersion>0.0.20</AssemblyVersion>
     <PackageIcon>icon.png</PackageIcon>
     <RepositoryUrl>https://github.com/Ackara/Sassin.git</RepositoryUrl>
     <PackageProjectUrl>https://github.com/Ackara/Sassin</PackageProjectUrl>
@@ -69,12 +69,12 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Helper.cs" />
-    <Compile Include="SassWatcher.cs" />
-    <Compile Include="Symbols.cs">
+    <Compile Include="Metadata.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>Symbols.tt</DependentUpon>
+      <DependentUpon>Metadata.tt</DependentUpon>
     </Compile>
+    <Compile Include="SassWatcher.cs" />
     <Compile Include="VSPackage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -130,9 +130,9 @@
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Symbols.tt">
+    <Content Include="Metadata.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>Symbols.cs</LastGenOutput>
+      <LastGenOutput>Metadata.cs</LastGenOutput>
     </Content>
   </ItemGroup>
   <ItemGroup>
