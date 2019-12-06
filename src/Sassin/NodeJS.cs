@@ -68,6 +68,8 @@ namespace Acklann.Sassin
 
             if (!Directory.EnumerateFiles(InstallationDirectory, "*.js").Any())
                 ExtractBinaries(handler, ref progress, goal, overwrite);
+
+            handler?.Invoke(string.Empty, goal, goal);
         }
 
         public static Task InstallAsync(ProgressHandler handler = default, bool overwrite = false)
