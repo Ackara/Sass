@@ -1,8 +1,23 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
-  </PropertyGroup>
+  
+<Title>Sassin</Title>
+<Description>A sass compiler.</Description>
+<Version>0.0.23</Version>
+<AssemblyVersion>0.0.23</AssemblyVersion>
+<AssemblyFileVersion>0.0.23</AssemblyFileVersion>
+<PackageIcon>icon.png</PackageIcon>
+<RepositoryUrl>https://github.com/Ackara/Sassin.git</RepositoryUrl>
+<PackageProjectUrl>https://github.com/Ackara/Sassin</PackageProjectUrl>
+<PackageReleaseNotes>https://github.com/Ackara/Sassin/blob/master/changelog.md</PackageReleaseNotes>
+<PackageTags>sass compiler</PackageTags>
+<Authors>Ackara</Authors>
+<Company>Ackara</Company>
+<Copyright>Copyright 2021 Ackara, All Rights Reserved.</Copyright>
+<PackageLicenseFile>license.md</PackageLicenseFile>
+</PropertyGroup>
 
   <Target Name="foo">
     <CompileSassFiles GenerateSourceMaps="false" Minify="true" />
@@ -10,4 +25,6 @@
 
 
   <Import Project="..\..\artifacts\msbuild\build\Sassin.targets" />
+
+
 </Project>

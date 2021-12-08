@@ -5,7 +5,7 @@
     <UseCodebase>true</UseCodebase>
     <Title>Sassin</Title>
     <Description>A sass compiler.</Description>
-    <Version>0.0.21-rc</Version>
+    <Version>0.0.23</Version>
     <AssemblyVersion>0.0.21</AssemblyVersion>
     <PackageIcon>icon.png</PackageIcon>
     <RepositoryUrl>https://github.com/Ackara/Sassin.git</RepositoryUrl>
@@ -13,7 +13,7 @@
     <PackageReleaseNotes>https://github.com/Ackara/Sassin/blob/master/changelog.md</PackageReleaseNotes>
     <PackageTags>sass compiler</PackageTags>
     <Authors>Ackara</Authors>
-    <Copyright>Copyright 2019 Ackara, All Rights Reserved.</Copyright>
+    <Copyright>Copyright 2021 Ackara, All Rights Reserved.</Copyright>
     <PackageLicenseFile>license.md</PackageLicenseFile>
     <Company>Ackara</Company>
     <RuntimeIdentifiers>win</RuntimeIdentifiers>
@@ -85,7 +85,10 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.VisualStudio.SDK" Version="16.0.202" ExcludeAssets="runtime" />
-    <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="16.3.2099" />
+    <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="17.0.5232">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="NuGet.VisualStudio">
       <Version>5.3.1</Version>
     </PackageReference>

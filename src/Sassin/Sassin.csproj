@@ -7,14 +7,14 @@
 
   <PropertyGroup Label="Package">
     <Title>Sassin</Title>
-    <Version>0.0.21-rc</Version>
-    <AssemblyVersion>0.0.21</AssemblyVersion>
+    <Version>0.0.23</Version>
+    <AssemblyVersion>0.0.23</AssemblyVersion>
     <Description>A sass compiler.</Description>
 
     <Authors>Ackara</Authors>
     <Company>Ackara</Company>
     <PackageLicenseFile>license.md</PackageLicenseFile>
-    <Copyright>Copyright 2019 Ackara, All Rights Reserved.</Copyright>
+    <Copyright>Copyright 2021 Ackara, All Rights Reserved.</Copyright>
 
     <PackageIcon>icon.png</PackageIcon>
     <PackageProjectUrl>https://github.com/Ackara/Sassin</PackageProjectUrl>
@@ -25,7 +25,9 @@
 
     <DevelopmentDependency>true</DevelopmentDependency>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-  </PropertyGroup>
+  
+<AssemblyFileVersion>0.0.23</AssemblyFileVersion>
+</PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Build.Framework" Version="16.3.0" />
@@ -62,4 +64,6 @@
   <ItemGroup>
     <None Remove="sassin-schema.json" />
   </ItemGroup>
+
+
 </Project>

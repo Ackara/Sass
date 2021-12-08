@@ -56,7 +56,7 @@
 
   <CommandPlacements>
     <CommandPlacement guid="CmdSet" id="VSMainMenuGroup" priority="500">
-      <Parent guid="guidSHLMainMenu" id="IDM_VS_MENU_TOOLS" />
+      <Parent guid="guidSHLMainMenu" id="IDG_VS_MM_TOOLSADDINS" />
     </CommandPlacement>
 
     <CommandPlacement guid="CmdSet" id="MainCommandGroup" priority="3">
@@ -96,6 +96,7 @@
 
       <IDSymbol name="MainMenu" value="0x0201" />
 
+      
       <IDSymbol name="GotoSettingsCommandId" value="0x0500" />
       <IDSymbol name="CompileSassFileCommandId" value="0x0501" />
       <IDSymbol name="InstallNugetPackageCommandId" value="0x0502" />

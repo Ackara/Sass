@@ -23,7 +23,7 @@ namespace Acklann.Sassin
 
         private static readonly string[] _dependencies = new string[]
         {
-            "node-sass@4.13.0", "csso@4.0.1", "multi-stage-sourcemap@0.3.1"
+            "node-sass@7.0.0", "csso@5.0.0", "multi-stage-sourcemap@0.3.1"
         };
 
         public static bool CheckInstallation()
