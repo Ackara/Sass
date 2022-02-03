@@ -30,7 +30,6 @@
       <Link>build.ps1</Link>
     </Compile>
     <Compile Include="tasks.psake.ps1" />
-    <Compile Include="toolkit.psm1" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\secrets.json">

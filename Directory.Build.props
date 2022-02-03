@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Project>
+	<PropertyGroup>
+		<SolutionDir>$(MSBuildThisFileDirectory)</SolutionDir>
+		<SolutionName>$([System.IO.Path]::GetFileName($(MSBuildThisFileDirectory)))</SolutionName>
+		<SecretFile>$([System.IO.Path]::Combine($(MSBuildThisFileDirectory), 'secrets.json'))</SecretFile>
+	</PropertyGroup>
+</Project>

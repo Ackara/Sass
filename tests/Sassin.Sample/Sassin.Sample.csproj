@@ -5,9 +5,9 @@
   
 <Title>Sassin</Title>
 <Description>A sass compiler.</Description>
-<Version>0.0.23</Version>
-<AssemblyVersion>0.0.23</AssemblyVersion>
-<AssemblyFileVersion>0.0.23</AssemblyFileVersion>
+<Version>0.0.24</Version>
+<AssemblyVersion>0.0.24</AssemblyVersion>
+<AssemblyFileVersion>0.0.24</AssemblyFileVersion>
 <PackageIcon>icon.png</PackageIcon>
 <RepositoryUrl>https://github.com/Ackara/Sassin.git</RepositoryUrl>
 <PackageProjectUrl>https://github.com/Ackara/Sassin</PackageProjectUrl>
@@ -15,7 +15,7 @@
 <PackageTags>sass compiler</PackageTags>
 <Authors>Ackara</Authors>
 <Company>Ackara</Company>
-<Copyright>Copyright 2021 Ackara, All Rights Reserved.</Copyright>
+<Copyright>Copyright 2022 Ackara, All Rights Reserved.</Copyright>
 <PackageLicenseFile>license.md</PackageLicenseFile>
 </PropertyGroup>
 

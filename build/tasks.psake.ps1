@@ -64,6 +64,8 @@ Task "Package-Solution" -alias "pack" -description "This task generates all depl
 	$project = Join-Path $SolutionFolder "src/$SolutionName/*.*proj" | Get-Item;
 	Write-Separator "dotnet pack $($project.BaseName)";
 	Exec { &dotnet pack $project.FullName --output $ArtifactsFolder --configuration $Configuration -p:EnvironmentName=$EnvironmentName; }
+
+	Join-Path $SolutionFolder "src/*.VSIX/bin/$Configuration/*.vsix" | Get-Item | Copy-Item -Destination $ArtifactsFolder;
 }
 
 Task "Publish-NuGet-Packages" -alias "push-nuget" -description "This task publish all nuget packages to a nuget repository." `
@@ -81,11 +83,12 @@ Task "Publish-VSIX-Package" -alias "push-vsix" -description "This task publish a
 -action {
 	[string]$vsixPublisher = Join-Path "$($env:ProgramFiles)*" "Microsoft Visual Studio\*\*\VSSDK\VisualStudioIntegration\Tools\Bin\VsixPublisher.exe" | Resolve-Path -ErrorAction Stop;
 	$package = Join-Path $ArtifactsFolder "*.vsix" | Get-Item;
-	$manifest = Join-Path $PSScriptRoot "publishing/visual-studio-marketplace.json" | Get-Item;
-	$pat = Get-Secret "VISUAL_STUDIO_MARKETPLACE_PAT" "vsixMarketplace";
-
+	$manifest = Join-Path $PSScriptRoot "visual-studio-maketplace-manifest.json" | Get-Item;
+	$pat = Get-Secret "vsixMarketplace" "VISUAL_STUDIO_MARKETPLACE_PAT";
+	
 	Write-Separator "VsixPublish publish -payload '$($package.Name)'";
-	Exec { &$vsixPublisher publish -payload $package.FullName -publishManifest $manifest.FullName -personalAccessToken $pat -ignoreWarnings "VSIXValidatorWarning01,VSIXValidatorWarning02"; }
+	#Exec { &$vsixPublisher login -publisherName "Tekcari" -personalAccessToken $pat; }
+	#Exec { &$vsixPublisher publish -payload $package.FullName -publishManifest $manifest.FullName -personalAccessToken $pat -ignoreWarnings "VSIXValidatorWarning01,VSIXValidatorWarning02"; }
 }
 
 Task "Add-GitReleaseTag" -alias "tag" -description "This task tags the lastest commit with the version number." `
@@ -214,8 +217,8 @@ Task "Build-Solution" -alias "compile" -description "This task compiles projects
 -action {
 	$solutionFile = Join-Path $SolutionFolder "*.sln" | Get-Item;
 	Write-Separator "msbuild '$($solutionFile.Name)'";
-	#Exec { &$MSBuildExe $solutionFile.FullName -property:Configuration=$Configuration -restore ; }
-	Exec { &dotnet build $solutionFile.FullName --configuration $Configuration -p:"EnvironmentName=$EnvironmentName"; }
+	Exec { &$MSBuildExe $solutionFile.FullName -property:"Configuration=$Configuration;EnvironmentName=$EnvironmentName" -restore ; }
+	#Exec { &dotnet build $solutionFile.FullName --configuration $Configuration -p:"EnvironmentName=$EnvironmentName"; }
 }
 
 Task "Run-Tests" -alias "test" -description "This task invoke all tests within the 'tests' folder." `
