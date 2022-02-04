@@ -56,8 +56,9 @@
       <PackagePath>build\$(AssemblyName).targets</PackagePath>
     </Content>
 
-    <Content Include="$(OutputPath)publish\*.*">
-      <PackagePath>build\</PackagePath>
+    <Content Include="bin\$(Configuration)\$(TargetFramework)\publish\*.*">
+      <PackagePath>tools</PackagePath>
+      <Visible>false</Visible>
     </Content>
   </ItemGroup>
 

@@ -8,7 +8,7 @@
   "identity":
   {
     
-    "internalName": "sassin" // If not specified, we try to generate the name from the display name of the extension in the vsixmanifest file.
+    "internalName": "sasskit" // If not specified, we try to generate the name from the display name of the extension in the vsixmanifest file.
     // Required if the display name is not the actual name of the extension.
   },
   "overview": "overview.md", // Path to the "readme" file that gets uploaded to the Marketplace. Required.

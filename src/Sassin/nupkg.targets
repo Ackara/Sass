@@ -12,7 +12,7 @@
 
     <SassCompilerOutputDirectory Condition="$(SassCompilerOutputDirectory)==''"></SassCompilerOutputDirectory>
     <SassCompilerSourceMapDirectory Condition="$(SassCompilerSourceMapDirectory)==''"></SassCompilerSourceMapDirectory>
-    <SassCompilerConfigurationFile Condition="$(SassCompilerConfigurationFile)==''">$(MSBuildProjectDirectory)\sassconfig.json</SassCompilerConfigurationFile>
+    <SassCompilerConfigurationFile Condition="$(SassCompilerConfigurationFile)==''">$(MSBuildProjectDirectory)\transpiler.json</SassCompilerConfigurationFile>
   </PropertyGroup>
 
   <Target Name="CompileSassFilesBeforeBuild"
@@ -32,5 +32,5 @@
                       GenerateSourceMaps="$(SassCompilerShouldGenerateSourceMap)" />
   </Target>
 
-  <UsingTask AssemblyFile=".\Sassin.dll" TaskName="CompileSassFiles" />
+  <UsingTask AssemblyFile="..\tools\Sassin.dll" TaskName="CompileSassFiles" />
 </Project>

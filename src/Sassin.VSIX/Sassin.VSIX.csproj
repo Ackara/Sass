@@ -17,6 +17,7 @@
     <PackageLicenseFile>license.md</PackageLicenseFile>
     <Company>Ackara</Company>
     <RuntimeIdentifiers>win</RuntimeIdentifiers>
+    <CompileSassFilesOnBuild>false</CompileSassFilesOnBuild>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
