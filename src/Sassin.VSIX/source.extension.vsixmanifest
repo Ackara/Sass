@@ -1,6 +1,6 @@
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="Sass.VSIX.88ed8a8b-e1f7-4496-9a4b-807fef4dba74" Version="0.0.23" Language="en-US" Publisher="Ackara" />
+        <Identity Id="Sass.VSIX.88ed8a8b-e1f7-4496-9a4b-807fef4dba74" Version="0.0.24" Language="en-US" Publisher="Tekcari" />
         <DisplayName>Sassin</DisplayName>
         <Description xml:space="preserve">A sass compiler.</Description>
         <MoreInfo>https://github.com/Ackara/Sassin</MoreInfo>
@@ -12,7 +12,9 @@
         <Preview>true</Preview>
     </Metadata>
     <Installation>
-        <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[15.0, 17.0)" />
+        <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.0, 18.0)">
+            <ProductArchitecture>amd64</ProductArchitecture>
+        </InstallationTarget>
     </Installation>
     <Prerequisites>
         <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[15.0,)" DisplayName="Visual Studio core editor" />
